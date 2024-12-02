@@ -17,11 +17,11 @@ class PengurusModel extends Model
             ->get()->getResultArray();
     }
 
-    public function relasiWargaBynik($id)
+    public function relasiWargaBynik($nik)
     {
         return $this->db->table('pengurus')
             ->join('warga', 'warga.nik = pengurus.nik')
-            ->where('pengurus.id_pengurus', $id)
+            ->where('pengurus.nik', $nik)
             ->get()->getResultArray();
     }
 

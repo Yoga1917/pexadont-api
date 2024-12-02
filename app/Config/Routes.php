@@ -56,7 +56,6 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], function ($routes)
 
     // api pengurus
     $routes->get('pengurus', 'ApiPengurus::index');
-    $routes->post('pengurus/tambah', 'ApiPengurus::new');
     $routes->post('pengurus/simpan', 'ApiPengurus::create');
     $routes->get('pengurus/edit/(:num)', 'ApiPengurus::edit/$1');
     $routes->post('pengurus/update/(:num)', 'ApiPengurus::edit/$1');
@@ -68,5 +67,8 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], function ($routes)
     $routes->get('warga/edit/(:num)', 'ApiWarga::edit/$1');
     $routes->post('warga/update/(:num)', 'ApiWarga::update/$1');
     $routes->delete('warga/delete/(:num)', 'ApiWarga::delete/$1');
-
+    
+    // check login
+    $routes->get('login', 'ApiLogin::login');
+    $routes->get('login/pengurus', 'ApiLogin::loginPengurus');
 });

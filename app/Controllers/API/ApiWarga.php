@@ -221,20 +221,6 @@ class ApiWarga extends ResourceController
                     'required' => 'Nomor whatsapp warga harus diisi'
                 ]
             ],
-            'password'  => [
-                'rules' => 'required',
-                'errors' => [
-                    'required' => 'Password warga harus diisi'
-                ]
-            ],
-            'foto'  => [
-                'rules' => 'max_size[foto,3072]|is_image[foto]|mime_in[foto,image/jpg,image/jpeg,image/png]',
-                'errors' => [
-                    'max_size' => 'Ukuran foto warga maksimal 3MB',
-                    'is_image' => 'File yang diupload harus berupa gambar',
-                    'mime_in' => 'Format foto warga harus jpg/jpeg/png'
-                ]
-            ],
             'status'  => [
                 'rules' => 'required',
                 'errors' => [
@@ -250,18 +236,6 @@ class ApiWarga extends ResourceController
             return $this->respond($response, 400);
         }
 
-        $foto = $this->request->getFile('foto');
-        $data = $this->model->find($id);
-        if ($foto->getError() == 4) {
-            $newName = $data['foto'];
-        } else {
-            $newName = $foto->getRandomName();
-            $foto->move('uploads/warga/', $newName);
-            if ($data['foto'] != 'default.jpg') {
-                unlink('uploads/warga/' . $data['foto']);
-            }
-        }
-
         $data = [
             'nik' => $this->request->getVar('nik'),
             'nama' => $this->request->getVar('nama'),
@@ -269,8 +243,6 @@ class ApiWarga extends ResourceController
             'jenis_kelamin' => $this->request->getVar('jenis_kelamin'),
             'no_rumah' => $this->request->getVar('no_rumah'),
             'no_wa' => $this->request->getVar('no_wa'),
-            'password' => password_hash($this->request->getVar('password'), PASSWORD_DEFAULT),
-            'foto' => $newName,
             'status' => $this->request->getVar('status')
         ];
 

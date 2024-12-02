@@ -2,6 +2,8 @@
 
 namespace App\Controllers\API;
 
+use App\Models\PengurusModel;
+use App\Models\WargaModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
@@ -10,6 +12,13 @@ class ApiPengurus extends ResourceController
     protected $PengurusModel;
     protected $WargaModel;
     protected $format = 'json';
+
+    public function __construct()
+    {
+        $this->PengurusModel = new PengurusModel();
+        $this->WargaModel = new WargaModel();
+    }
+
     /**
      * Return an array of resource objects, themselves in array format.
      *
@@ -39,22 +48,6 @@ class ApiPengurus extends ResourceController
     }
 
     /**
-     * Return a new resource object, with default properties.
-     *
-     * @return ResponseInterface
-     */
-    public function new()
-    {
-        $data = [
-            'status' => 200,
-            'error' => false,
-            'message' => 'Data Warga Berhasil Diambil',
-            'data' => $this->WargaModel->findAll()
-        ];
-        return $this->respond($data, 200);
-    }
-
-    /**
      * Create a new resource object, from "posted" parameters.
      *
      * @return ResponseInterface
@@ -81,16 +74,6 @@ class ApiPengurus extends ResourceController
                 'message' => $this->validator->getErrors()
             ];
             return $this->respond($response, 400);
-        }
-
-        $nik = $this->WargaModel->find($this->request->getPost('nik'));
-        if (empty($nik)) {
-            $response = [
-                'status' => 404,
-                'error' => true,
-                'message' => 'NIK Tidak Ditemukan'
-            ];
-            return $this->respond($response, 404);
         }
 
         $data = [
