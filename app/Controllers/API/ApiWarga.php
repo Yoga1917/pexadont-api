@@ -2,6 +2,7 @@
 
 namespace App\Controllers\API;
 
+use App\Models\PengurusModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
@@ -9,6 +10,13 @@ class ApiWarga extends ResourceController
 {
     protected $modelName = 'App\Models\WargaModel';
     protected $format    = 'json';
+    protected $pengurusModel;
+    
+    public function __construct()
+    {
+        $this->pengurusModel = new PengurusModel();
+    }
+
     /**
      * Return an array of resource objects, themselves in array format.
      *
@@ -266,14 +274,24 @@ class ApiWarga extends ResourceController
     {
         $data = $this->model->find($id);
         if ($data) {
-            $this->model->delete($id);
-            unlink('uploads/warga/' . $data['foto']);
-            $response = [
-                'status' => 203,
-                'error' => false,
-                'data' => 'Warga berhasil dihapus'
-            ];
-            return $this->respondDeleted($response, 203);
+            $cekPengurus = $this->pengurusModel->where('nik', $id)->get()->getResultArray();
+            if(count($cekPengurus) > 0){
+                $response = [
+                    'status' => 400,
+                    'error' => true,
+                    'data' => 'Data warga ini tercatat sebagai '.$cekPengurus[0]['jabatan'].', hapus kepengurusan terlebih dahulu'
+                ];
+                return $this->respond($response, 400);
+            }else{
+                $this->model->delete($id);
+                unlink('uploads/warga/' . $data['foto']);
+                $response = [
+                    'status' => 203,
+                    'error' => false,
+                    'data' => 'Warga berhasil dihapus'
+                ];
+                return $this->respondDeleted($response, 203);
+            }
         } else {
             $response = [
                 'status' => 404,

@@ -76,6 +76,26 @@ class ApiPengurus extends ResourceController
             return $this->respond($response, 400);
         }
 
+        $cekNik = $this->PengurusModel->where('nik', $this->request->getPost('nik'))->get()->getResultArray();
+        if(count($cekNik) > 0){
+            $response = [
+                'status' => 400,
+                'error' => true,
+                'data' => 'Pengurus dengan NIK tersebut sudah tersedia'
+            ];
+            return $this->respond($response, 400);
+        }
+        
+        $cekJabatan = $this->PengurusModel->where('jabatan', $this->request->getPost('jabatan'))->get()->getResultArray();
+        if(count($cekJabatan) > 0){
+            $response = [
+                'status' => 400,
+                'error' => true,
+                'data' => 'Pengurus dengan jabatan '.$this->request->getPost('jabatan').' sudah tersedia'
+            ];
+            return $this->respond($response, 400);
+        }        
+
         $data = [
             'nik' => $this->request->getPost('nik'),
             'jabatan' => $this->request->getPost('jabatan')
