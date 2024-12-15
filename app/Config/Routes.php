@@ -18,10 +18,12 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], function ($routes)
 
     // api kas
     $routes->get('kas', 'ApiKas::index');
-    $routes->post('kas/simpan', 'ApiKas::create');
-    $routes->get('kas/edit/(:num)', 'ApiKas::edit/$1');
-    $routes->post('kas/update/(:num)', 'ApiKas::update/$1');
-    $routes->delete('kas/delete/(:num)', 'ApiKas::delete/$1');
+    $routes->get('kas/last', 'ApiKas::lastData');
+    $routes->get('kas/publish', 'ApiKas::publishData');
+    $routes->get('kas/pemasukan', 'ApiKas::pemasukanData');
+    $routes->get('kas/pengeluaran', 'ApiKas::pengeluaranData');
+    $routes->post('kas/pemasukan/simpan', 'ApiKas::pemasukan');
+    $routes->post('kas/pengeluaran/simpan', 'ApiKas::pengeluaran');
 
     // api fasilitas
     $routes->get('fasilitas', 'ApiFasilitas::index');
