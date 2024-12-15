@@ -4,28 +4,11 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class PengaduanModel extends Model
+class PemasukanModel extends Model
 {
-    protected $table            = 'pengaduan';
-    protected $primaryKey       = 'id_pengaduan';
-    protected $allowedFields    = ['id_pengaduan', 'nik', 'isi', 'foto', 'tgl', 'jenis', 'balasan'];
-
-    public function relasiWarga()
-    {
-        return $this->db->table('pengaduan')
-            ->join('warga', 'warga.nik = pengaduan.nik')
-            ->select('id_pengaduan, pengaduan.nik, pengaduan.isi, pengaduan.foto, pengaduan.tgl, pengaduan.jenis, pengaduan.balasan, warga.nama')
-            ->get()->getResultArray();
-    }
-
-    public function findByJenis($jenis)
-    {
-        return $this->db->table('pengaduan')
-            ->join('warga', 'warga.nik = pengaduan.nik')
-            ->select('id_pengaduan, pengaduan.nik, pengaduan.isi, pengaduan.foto, pengaduan.tgl, pengaduan.jenis, pengaduan.balasan, warga.nama')
-            ->where('pengaduan.jenis', $jenis)
-            ->get()->getResultArray();
-    }
+    protected $table            = 'pemasukan';
+    protected $primaryKey       = 'id_pemasukan';
+    protected $allowedFields    = ['id_kas', 'jumlah', 'keterangan'];
 
     // protected $useAutoIncrement = true;
     // protected $returnType       = 'array';

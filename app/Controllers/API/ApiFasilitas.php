@@ -68,11 +68,12 @@ class ApiFasilitas extends ResourceController
                 ]
             ],
             'foto'  => [
-                'rules' => 'max_size[fasilitas.foto,3072]|is_image[fasilitas.foto]|mime_in[fasilitas.foto,image/jpg,image/jpeg,image/png]',
+                'rules' => 'uploaded[foto]|max_size[foto,3072]|is_image[foto]|mime_in[foto,image/jpg,image/jpeg,image/png]',
                 'errors' => [
-                    'max_size' => 'Ukuran foto fasilitas maksimal 3MB.',
-                    'is_image' => 'Yang anda pilih bukan gambar.',
-                    'mime_in'  => 'Format gambar harus jpg/jpeg/png.'
+                    'uploaded' => 'Foto Fasilitas harus diisi',
+                    'max_size' => 'Ukuran foto Fasilitas maksimal 3MB',
+                    'is_image' => 'File yang diupload harus berupa gambar',
+                    'mime_in' => 'Format foto Fasilitas harus jpg/jpeg/png'
                 ]
             ],
             'status'  => [
@@ -83,45 +84,29 @@ class ApiFasilitas extends ResourceController
             ]
         ])) {
             $response = [
-                'status'    => 400,
-                'error'     => $this->validator->getErrors(),
-                'message'   => 'Data yang dikirimkan tidak lengkap.'
+                'status' => 400,
+                'error'  => true,
+                'data'   => $this->validator->getErrors()
             ];
 
             return $this->respond($response, 400);
         }
 
-        if ($this->request->getFile('foto') != null) {
-            $file = $this->request->getFile('foto');
-            $namaFoto = $file->getRandomName();
-            $file->move('uploads/fasilitas/', $namaFoto);
-            $data = [
-                'nama'      => $this->request->getPost('nama'),
-                'jml'       => $this->request->getPost('jml'),
-                'foto'      => $namaFoto,
-                'status'    => $this->request->getPost('status')
-            ];
-            return $this->model->insert($data);
-            $response = [
-                'status'    => 201,
-                'error'     => null,
-                'message'   => 'Data berhasil disimpan.'
-            ];
-
-            return $this->respondCreated($response, 201);
-        }
+        $foto = $this->request->getFile('foto');
+        $newName = $foto->getRandomName();
+        $foto->move('uploads/fasilitas/', $newName);
 
         $data = [
-            'nama'      => $this->request->getPost('nama'),
-            'jml'       => $this->request->getPost('jml'),
-            'foto'      => null,
-            'status'    => $this->request->getPost('status')
+            'nama'      => $this->request->getVar('nama'),
+            'jml'       => $this->request->getVar('jml'),
+            'foto'      => $newName,
+            'status'    => $this->request->getVar('status')
         ];
         return $this->model->insert($data);
         $response = [
-            'status'    => 201,
-            'error'     => null,
-            'message'   => 'Data berhasil disimpan. (tanpa foto)'
+            'status'    => 200,
+            'error'     => false,
+            'data'   => 'Data berhasil disimpan.'
         ];
 
         return $this->respondCreated($response, 201);
@@ -137,17 +122,20 @@ class ApiFasilitas extends ResourceController
     public function edit($id = null)
     {
         $data = $this->model->find($id);
-
         if ($data) {
             $response = [
-                'status'    => 200,
-                'message'   => 'Success',
-                'data'      => $data
+                'status' => 200,
+                'error' => false,
+                'data' => $data
             ];
-
             return $this->respond($response, 200);
         } else {
-            return $this->failNotFound('Data tidak ditemukan dengan id ' . $id);
+            $response = [
+                'status' => 404,
+                'error' => true,
+                'data' => 'Fasilitas tidak ditemukan'
+            ];
+            return $this->respond($response, 404);
         }
     }
 
@@ -173,14 +161,6 @@ class ApiFasilitas extends ResourceController
                     'required' => 'Jumlah fasilitas harus diisi.'
                 ]
             ],
-            'foto'  => [
-                'rules' => 'max_size[fasilitas.foto,3072]|is_image[fasilitas.foto]|mime_in[fasilitas.foto,image/jpg,image/jpeg,image/png]',
-                'errors' => [
-                    'max_size' => 'Ukuran foto fasilitas maksimal 3MB.',
-                    'is_image' => 'Yang anda pilih bukan gambar.',
-                    'mime_in'  => 'Format gambar harus jpg/jpeg/png.'
-                ]
-            ],
             'status'  => [
                 'rules' => 'required',
                 'errors' => [
@@ -189,39 +169,25 @@ class ApiFasilitas extends ResourceController
             ]
         ])) {
             $response = [
-                'status'    => 400,
-                'errors'    => $this->validator->getErrors(),
-                'message'   => 'Data yang dikirimkan tidak lengkap.'
+                'status' => 400,
+                'error' => true,
+                'data' => $this->validator->getErrors()
             ];
             return $this->respond($response, 400);
         }
 
-        if ($this->request->getFile('foto') != null) {
-            $file = $this->request->getFile('foto');
-            $namaFoto = $file->getRandomName();
-            $file->move('uploads/fasilitas/', $namaFoto);
-            $id = $this->model->find($id);
-            if ($id['foto'] != null) {
-                unlink('uploads/fasilitas/' . $id['foto']);
-            }
-        }
-
-        $updateFoto = ($this->request->getFile('foto') != null) ? $namaFoto : $id['foto'];
-
         $data = [
-            'nama'      => $this->request->getRawInput('nama'),
-            'jml'       => $this->request->getRawInput('jml'),
-            'foto'      => $updateFoto,
-            'status'    => $this->request->getRawInput('status')
+            'nama'      => $this->request->getVar('nama'),
+            'jml'       => $this->request->getVar('jml'),
+            'status'    => $this->request->getVar('status')
         ];
 
         $this->model->update($id, $data);
         $response = [
-            'status'    => 202,
-            'error'     => null,
-            'message'   => 'Data berhasil diupdate.'
+            'status' => 202,
+            'error' => false,
+            'data' => 'Fasilitas berhasil diupdate'
         ];
-
         return $this->respond($response, 202);
     }
 
@@ -232,23 +198,4 @@ class ApiFasilitas extends ResourceController
      *
      * @return ResponseInterface
      */
-    public function delete($id = null)
-    {
-        $data = $this->model->find($id);
-
-        if ($data) {
-            $this->model->delete($id);
-            if ($data['foto'] != null) {
-                unlink('uploads/fasilitas/' . $data['foto']);
-            }
-            $response = [
-                'status'    => 203,
-                'message'   => 'Data berhasil dihapus.'
-            ];
-
-            return $this->respondDeleted($response, 203);
-        } else {
-            return $this->failNotFound('Data tidak ditemukan dengan id ' . $id);
-        }
-    }
 }

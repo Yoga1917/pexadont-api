@@ -18,17 +18,18 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], function ($routes)
 
     // api kas
     $routes->get('kas', 'ApiKas::index');
-    $routes->post('kas/simpan', 'ApiKas::create');
-    $routes->get('kas/edit/(:num)', 'ApiKas::edit/$1');
-    $routes->post('kas/update/(:num)', 'ApiKas::update/$1');
-    $routes->delete('kas/delete/(:num)', 'ApiKas::delete/$1');
+    $routes->get('kas/last', 'ApiKas::lastData');
+    $routes->get('kas/publish', 'ApiKas::publishData');
+    $routes->get('kas/pemasukan', 'ApiKas::pemasukanData');
+    $routes->get('kas/pengeluaran', 'ApiKas::pengeluaranData');
+    $routes->post('kas/pemasukan/simpan', 'ApiKas::pemasukan');
+    $routes->post('kas/pengeluaran/simpan', 'ApiKas::pengeluaran');
 
     // api fasilitas
     $routes->get('fasilitas', 'ApiFasilitas::index');
     $routes->post('fasilitas/simpan', 'ApiFasilitas::create');
     $routes->get('fasilitas/edit/(:num)', 'ApiFasilitas::edit/$1');
     $routes->post('fasilitas/update/(:num)', 'ApiFasilitas::update/$1');
-    $routes->delete('fasilitas/delete/(:num)', 'ApiFasilitas::delete/$1');
 
     // api kegiatan
     $routes->get('kegiatan', 'ApiKegiatan::index');
@@ -42,17 +43,12 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], function ($routes)
     // api pemberitahuan
     $routes->get('pemberitahuan', 'ApiPemberitahuan::index');
     $routes->post('pemberitahuan/simpan', 'ApiPemberitahuan::create');
-    $routes->get('pemberitahuan/edit/(:num)', 'ApiPemberitahuan::edit/$1');
-    $routes->post('pemberitahuan/update/(:num)', 'ApiPemberitahuan::update/$1');
-    $routes->delete('pemberitahuan/delete/(:num)', 'ApiPemberitahuan::delete/$1');
 
     // api pengaduan
     $routes->get('pengaduan', 'ApiPengaduan::index');
-    $routes->post('pengaduan/tambah', 'ApiPengaduan::new');
     $routes->post('pengaduan/simpan', 'ApiPengaduan::create');
-    $routes->get('pengaduan/edit/(:num)', 'ApiPengaduan::edit/$1');
-    $routes->post('pengaduan/update/(:num)', 'ApiPengaduan::update/$1');
-    $routes->delete('pengaduan/delete/(:num)', 'ApiPengaduan::delete/$1');
+    $routes->get('pengaduan/jenis/(:any)', 'ApiPengaduan::jenis/$1');
+    $routes->post('pengaduan/balas', 'ApiPengaduan::balas');
 
     // api pengurus
     $routes->get('pengurus', 'ApiPengurus::index');

@@ -2,6 +2,8 @@
 
 namespace App\Controllers\API;
 
+use App\Models\PemasukanModel;
+use App\Models\PengeluaranModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
@@ -9,223 +11,180 @@ class ApiKas extends ResourceController
 {
     protected $modelName = 'App\Models\KasModel';
     protected $format    = 'json';
-    /**
-     * Return an array of resource objects, themselves in array format.
-     *
-     * @return ResponseInterface
-     */
+    protected $pemasukanModel;
+    protected $pengeluaranModel;
+    
+    public function __construct()
+    {
+        $this->pemasukanModel = new PemasukanModel();
+        $this->pengeluaranModel = new PengeluaranModel();
+    }
+
     public function index()
     {
+        $tahun = $this->request->getGet('tahun') ?? null;
+
         $data = [
-            'status'    => 200,
-            'message'   => 'Success',
-            'data'      => $this->model->findAll()
+            'status' => 200,
+            'message' => 'success',
+            'data' => $this->model->getAll($tahun),
         ];
 
         return $this->respond($data, 200);
     }
 
-    /**
-     * Return the properties of a resource object.
-     *
-     * @param int|string|null $id
-     *
-     * @return ResponseInterface
-     */
-    public function show($id = null)
+    public function lastData()
     {
-        //
+        $data = [
+            'status' => 200,
+            'message' => 'success',
+            'data' => $this->model->getLastData(),
+        ];
+
+        return $this->respond($data, 200);
+    }
+    
+    public function publishData()
+    {
+        $tahun = $this->request->getGet('tahun') ?? null;
+        
+        $data = [
+            'status' => 200,
+            'message' => 'success',
+            'data' => $this->model->getAllPublish($tahun),
+        ];
+
+        return $this->respond($data, 200);
     }
 
-    /**
-     * Return a new resource object, with default properties.
-     *
-     * @return ResponseInterface
-     */
-    public function new()
-    {
-        //
-    }
-
-    /**
-     * Create a new resource object, from "posted" parameters.
-     *
-     * @return ResponseInterface
-     */
-    public function create()
+    public function pemasukan()
     {
         if (!$this->validate([
-            'bulan'         => [
-                'rules'     => 'required',
-                'errors'    => [
-                    'required'  => 'Bulan harus diisi.'
+            'id_kas'    => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'ID Kas harus diisi'
                 ]
             ],
-            'pemasukan'     => [
-                'rules'     => 'required',
-                'errors'    => [
-                    'required'  => 'Pemasukan harus diisi.'
-                ]
-            ],
-            'pengeluaran'   => [
-                'rules'     => 'required',
-                'errors'    => [
-                    'required'  => 'Pengeluaran harus diisi.'
-                ]
-            ],
-            'keterangan'    => [
-                'rules'     => 'required',
-                'errors'    => [
-                    'required'  => 'Keterangan harus diisi.'
-                ]
-            ],
-            'tgl&waktu'     => [
-                'rules'     => 'required',
-                'errors'    => [
-                    'required'  => 'Tanggal dan waktu harus diisi.'
+            'jumlah'    => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'Jumlah harus diisi'
                 ]
             ]
         ])) {
             $response = [
-                'status'    => 400,
-                'errors'    => $this->validator->getErrors(),
-                'message'   => 'Data yang dikirimkan tidak lengkap.'
+                'status' => 400,
+                'error' => true,
+                'validation' => $this->validator->getErrors()
             ];
             return $this->respond($response, 400);
         }
 
         $data = [
-            'bulan'         => $this->request->getPost('bulan'),
-            'pemasukan'     => $this->request->getPost('pemasukan'),
-            'pengeluaran'   => $this->request->getPost('pengeluaran'),
-            'keterangan'    => $this->request->getPost('keterangan'),
-            'tgl&waktu'     => $this->request->getPost('tgl&waktu')
+            'id_kas' => $this->request->getVar('id_kas'),
+            'jumlah' => $this->request->getVar('jumlah'),
+            'keterangan' => $this->request->getVar('keterangan') ?? null,
         ];
 
-        $this->model->insert($data);
+        $this->pemasukanModel->insert($data);
+
         $response = [
-            'status'    => 201,
-            'error'     => null,
-            'message'   => 'Data berhasil disimpan.'
+            'status' => 201,
+            'error' => false,
+            'message' => 'Data pemasukan berhasil ditambahkan'
         ];
-
         return $this->respondCreated($response, 201);
     }
 
-    /**
-     * Return the editable properties of a resource object.
-     *
-     * @param int|string|null $id
-     *
-     * @return ResponseInterface
-     */
-    public function edit($id = null)
-    {
-        $data = $this->model->find($id);
-
-        if ($data) {
-            $response = [
-                'status'    => 200,
-                'message'   => 'Success',
-                'data'      => $data
-            ];
-
-            return $this->respond($response, 200);
-        } else {
-            return $this->failNotFound('Data tidak ditemukan dengan id ' . $id);
-        }
-    }
-
-    /**
-     * Add or update a model resource, from "posted" properties.
-     *
-     * @param int|string|null $id
-     *
-     * @return ResponseInterface
-     */
-    public function update($id = null)
+    public function pengeluaran()
     {
         if (!$this->validate([
-            'bulan'         => [
-                'rules'     => 'required',
-                'errors'    => [
-                    'required'  => 'Bulan harus diisi.'
+            'id_kas'    => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'ID Kas harus diisi'
                 ]
             ],
-            'pemasukan'     => [
-                'rules'     => 'required',
-                'errors'    => [
-                    'required'  => 'Pemasukan harus diisi.'
-                ]
-            ],
-            'pengeluaran'   => [
-                'rules'     => 'required',
-                'errors'    => [
-                    'required'  => 'Pengeluaran harus diisi.'
-                ]
-            ],
-            'keterangan'    => [
-                'rules'     => 'required',
-                'errors'    => [
-                    'required'  => 'Keterangan harus diisi.'
-                ]
-            ],
-            'tgl&waktu'     => [
-                'rules'     => 'required',
-                'errors'    => [
-                    'required'  => 'Tanggal dan waktu harus diisi.'
+            'jumlah'    => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'Jumlah harus diisi'
                 ]
             ]
         ])) {
             $response = [
-                'status'    => 400,
-                'errors'    => $this->validator->getErrors(),
-                'message'   => 'Data yang dikirimkan tidak lengkap.'
+                'status' => 400,
+                'error' => true,
+                'validation' => $this->validator->getErrors()
             ];
             return $this->respond($response, 400);
         }
 
+        $foto = $this->request->getFile('foto');
+        if(is_null($foto)){
+            $namaFoto = null;
+        } else {
+            $namaFoto = $foto->getRandomName();
+            $foto->move('uploads/pengeluaran_kas/', $namaFoto);
+        }
+
         $data = [
-            'bulan'         => $this->request->getPost('bulan'),
-            'pemasukan'     => $this->request->getPost('pemasukan'),
-            'pengeluaran'   => $this->request->getPost('pengeluaran'),
-            'keterangan'    => $this->request->getPost('keterangan'),
-            'tgl&waktu'     => $this->request->getPost('tgl&waktu')
+            'id_kas' => $this->request->getVar('id_kas'),
+            'jumlah' => $this->request->getVar('jumlah'),
+            'keterangan' => $this->request->getVar('keterangan') ?? null,
+            'foto' => $namaFoto,
         ];
 
-        $this->model->update($id, $data);
+        $this->pengeluaranModel->insert($data);
 
         $response = [
-            'status'    => 202,
-            'error'     => null,
-            'message'   => 'Data berhasil diubah.'
+            'status' => 201,
+            'error' => false,
+            'message' => 'Data pengeluaran berhasil ditambahkan'
         ];
-
-        return $this->respond($response, 202);
+        return $this->respondCreated($response, 201);
     }
 
-    /**
-     * Delete the designated resource object from the model.
-     *
-     * @param int|string|null $id
-     *
-     * @return ResponseInterface
-     */
-    public function delete($id = null)
+    public function pemasukanData()
     {
-        $data = $this->model->find($id);
+        $id_kas = $this->request->getGet('id_kas') ?? null;
 
-        if ($data) {
-            $this->model->delete($id);
-            $response = [
-                'status'    => 203,
-                'error'     => null,
-                'message'   => 'Data berhasil dihapus.'
-            ];
-
-            return $this->respondDeleted($response, 203);
-        } else {
-            return $this->failNotFound('Data tidak ditemukan dengan id ' . $id);
+        if($id_kas == null){
+            return json_encode([
+                'status' => 404,
+                'message' => 'success',
+                'data' => "ID Kas tidak ditemukan",
+            ]);
         }
+
+        $data = [
+            'status' => 200,
+            'message' => 'success',
+            'data' => $this->pemasukanModel->where('id_kas', $id_kas)->get()->getResultArray(),
+        ];
+
+        return $this->respond($data, 200);
+    }
+
+    public function pengeluaranData()
+    {
+        $id_kas = $this->request->getGet('id_kas') ?? null;
+
+        if($id_kas == null){
+            return json_encode([
+                'status' => 404,
+                'message' => 'success',
+                'data' => "ID Kas tidak ditemukan",
+            ]);
+        }
+
+        $data = [
+            'status' => 200,
+            'message' => 'success',
+            'data' => $this->pengeluaranModel->where('id_kas', $id_kas)->get()->getResultArray(),
+        ];
+
+        return $this->respond($data, 200);
     }
 }

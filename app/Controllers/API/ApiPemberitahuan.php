@@ -17,9 +17,9 @@ class ApiPemberitahuan extends ResourceController
     public function index()
     {
         $data = [
-            'status'    => 200,
-            'mesage'    => 'Success',
-            'data'      => $this->model->findAll()
+            'status' => 200,
+            'error' => false,
+            'data' => $this->model->findAll()
         ];
 
         return $this->respond($data, 200);
@@ -73,184 +73,41 @@ class ApiPemberitahuan extends ResourceController
                     'required' => 'Tanggal harus diisi.'
                 ]
             ],
-            'foto'  => [
-                'rules' => 'max_size[foto,3072]|is_image[foto]|mime_in[foto,image/jpg,image/jpeg,image/png]',
+            'file'  => [
+                'rules' => 'uploaded[file]|max_size[file,3072]|mime_in[file,application/pdf]',
                 'errors' => [
-                    'max_size' => 'Ukuran foto terlalu besar. Maksimal 3MB.',
-                    'is_image' => 'File yang diupload bukan foto.',
-                    'mime_in'  => 'Format foto harus jpg/jpeg/png.'
+                    'uploaded' => 'File pemberitahuan harus diisi.',
+                    'max_size' => 'Ukuran file pemberitahuan maksimal 3MB.',
+                    'mime_in' => 'Format file pemberitahuan harus PDF.'
                 ]
-            ]
+            ],
+
         ])) {
             $response = [
-                'status'    => 400,
-                'error'     => true,
-                'message'   => $this->validator->getErrors()
+                'status' => 400,
+                'error' => true,
+                'data' => $this->validator->getErrors()
             ];
             return $this->respond($response, 400);
         }
 
-        $foto = $this->request->getFile('foto');
-        if ($foto->getError() == 4) {
-            $namaFoto = 'default.jpg';
-        } else {
-            $namaFoto = $foto->getRandomName();
-            $foto->move('uploads/pemberitahuan/', $namaFoto);
-        }
+        $file = $this->request->getFile('file');
+        $newName = $file->getRandomName();
+        $file->move('uploads/pemberitahuan/', $newName);
 
         $data = [
-            'pemberitahuan'  => $this->request->getPost('pemberitahuan'),
-            'deskripsi'      => $this->request->getPost('deskripsi'),
-            'tgl'            => $this->request->getPost('tgl'),
-            'foto'           => $namaFoto
+            'pemberitahuan'  => $this->request->getVar('pemberitahuan'),
+            'deskripsi'      => $this->request->getVar('deskripsi'),
+            'tgl'            => $this->request->getVar('tgl'),
+            'file'           => $newName
         ];
 
         $this->model->insert($data);
         $response = [
-            'status'    => 201,
-            'error'     => false,
-            'message'   => 'Data berhasil disimpan.'
+            'status' => 200,
+            'error' => false,
+            'data' => 'Pemberitahuan berhasil ditambahkan'
         ];
-        return $this->respondCreated($response, 201);
-    }
-
-    /**
-     * Return the editable properties of a resource object.
-     *
-     * @param int|string|null $id
-     *
-     * @return ResponseInterface
-     */
-    public function edit($id = null)
-    {
-        $data = $this->model->find($id);
-        if ($data) {
-            $response = [
-                'status'    => 200,
-                'message'   => 'Success',
-                'data'      => $data
-            ];
-            return $this->respond($response, 200);
-        } else {
-            $response = [
-                'status'    => 404,
-                'error'     => true,
-                'message'   => 'Data tidak ditemukan.'
-            ];
-            return $this->respond($response, 404);
-        }
-    }
-
-    /**
-     * Add or update a model resource, from "posted" properties.
-     *
-     * @param int|string|null $id
-     *
-     * @return ResponseInterface
-     */
-    public function update($id = null)
-    {
-        if (!$this->validate([
-            'pemberitahuan' => [
-                'rules' => 'required',
-                'errors' => [
-                    'required' => 'Pemberitahuan harus diisi.'
-                ]
-            ],
-            'deskripsi' => [
-                'rules' => 'required',
-                'errors' => [
-                    'required' => 'Deskripsi harus diisi.'
-                ]
-            ],
-            'tgl' => [
-                'rules' => 'required',
-                'errors' => [
-                    'required' => 'Tanggal harus diisi.'
-                ]
-            ],
-            'foto'  => [
-                'rules' => 'max_size[foto,3072]|is_image[foto]|mime_in[foto,image/jpg,image/jpeg,image/png]',
-                'errors' => [
-                    'max_size' => 'Ukuran foto terlalu besar. Maksimal 3MB.',
-                    'is_image' => 'File yang diupload bukan foto.',
-                    'mime_in'  => 'Format foto harus jpg/jpeg/png.'
-                ]
-            ]
-        ])) {
-            $response = [
-                'status'    => 400,
-                'error'     => true,
-                'message'   => $this->validator->getErrors()
-            ];
-            return $this->respond($response, 400);
-        }
-
-        $data = $this->model->find($id);
-        if ($data) {
-            $foto = $this->request->getFile('foto');
-            if ($foto->getError() == 4) {
-                $namaFoto = $data['foto'];
-            } else {
-                if ($data['foto'] != 'default.jpg') {
-                    unlink('uploads/pemberitahuan/' . $data['foto']);
-                }
-                $namaFoto = $foto->getRandomName();
-                $foto->move('uploads/pemberitahuan/', $namaFoto);
-            }
-
-            $data = [
-                'pemberitahuan'  => $this->request->getPost('pemberitahuan'),
-                'deskripsi'      => $this->request->getPost('deskripsi'),
-                'tgl'            => $this->request->getPost('tgl'),
-                'foto'           => $namaFoto
-            ];
-
-            $this->model->update($id, $data);
-            $response = [
-                'status'    => 202,
-                'error'     => false,
-                'message'   => 'Data berhasil diupdate.'
-            ];
-            return $this->respond($response, 202);
-        } else {
-            $response = [
-                'status'    => 404,
-                'error'     => true,
-                'message'   => 'Data tidak ditemukan.'
-            ];
-            return $this->respond($response, 404);
-        }
-    }
-
-    /**
-     * Delete the designated resource object from the model.
-     *
-     * @param int|string|null $id
-     *
-     * @return ResponseInterface
-     */
-    public function delete($id = null)
-    {
-        $data = $this->model->find($id);
-        if ($data) {
-            if ($data['foto'] != 'default.jpg') {
-                unlink('uploads/pemberitahuan/' . $data['foto']);
-            }
-            $this->model->delete($id);
-            $response = [
-                'status'    => 203,
-                'error'     => false,
-                'message'   => 'Data berhasil dihapus.'
-            ];
-            return $this->respondDeleted($response, 203);
-        } else {
-            $response = [
-                'status'    => 404,
-                'error'     => true,
-                'message'   => 'Data tidak ditemukan.'
-            ];
-            return $this->respond($response, 404);
-        }
+        return $this->respondCreated($response, 200);
     }
 }
