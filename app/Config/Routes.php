@@ -44,11 +44,9 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], function ($routes)
 
     // api pengaduan
     $routes->get('pengaduan', 'ApiPengaduan::index');
-    $routes->post('pengaduan/tambah', 'ApiPengaduan::new');
     $routes->post('pengaduan/simpan', 'ApiPengaduan::create');
-    $routes->get('pengaduan/edit/(:num)', 'ApiPengaduan::edit/$1');
-    $routes->post('pengaduan/update/(:num)', 'ApiPengaduan::update/$1');
-    $routes->delete('pengaduan/delete/(:num)', 'ApiPengaduan::delete/$1');
+    $routes->get('pengaduan/jenis/(:any)', 'ApiPengaduan::jenis/$1');
+    $routes->post('pengaduan/balas', 'ApiPengaduan::balas');
 
     // api pengurus
     $routes->get('pengurus', 'ApiPengurus::index');

@@ -8,21 +8,23 @@ class PengaduanModel extends Model
 {
     protected $table            = 'pengaduan';
     protected $primaryKey       = 'id_pengaduan';
-    protected $allowedFields    = ['nik', 'keluhan', 'foto', 'tgl&waktu'];
+    protected $allowedFields    = ['id_pengaduan', 'nik', 'isi', 'foto', 'tgl', 'jenis', 'balasan'];
 
     public function relasiWarga()
     {
         return $this->db->table('pengaduan')
             ->join('warga', 'warga.nik = pengaduan.nik')
+            ->select('id_pengaduan, pengaduan.nik, pengaduan.isi, pengaduan.foto, pengaduan.tgl, pengaduan.jenis, pengaduan.balasan, warga.nama')
             ->get()->getResultArray();
     }
 
-    public function relasiWargaById($id)
+    public function findByJenis($jenis)
     {
         return $this->db->table('pengaduan')
             ->join('warga', 'warga.nik = pengaduan.nik')
-            ->where('id_pengaduan', $id)
-            ->get()->getRowArray();
+            ->select('id_pengaduan, pengaduan.nik, pengaduan.isi, pengaduan.foto, pengaduan.tgl, pengaduan.jenis, pengaduan.balasan, warga.nama')
+            ->where('pengaduan.jenis', $jenis)
+            ->get()->getResultArray();
     }
 
     // protected $useAutoIncrement = true;
