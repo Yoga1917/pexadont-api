@@ -28,7 +28,6 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], function ($routes)
     $routes->post('fasilitas/simpan', 'ApiFasilitas::create');
     $routes->get('fasilitas/edit/(:num)', 'ApiFasilitas::edit/$1');
     $routes->post('fasilitas/update/(:num)', 'ApiFasilitas::update/$1');
-    $routes->delete('fasilitas/delete/(:num)', 'ApiFasilitas::delete/$1');
 
     // api kegiatan
     $routes->get('kegiatan', 'ApiKegiatan::index');
@@ -42,9 +41,6 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], function ($routes)
     // api pemberitahuan
     $routes->get('pemberitahuan', 'ApiPemberitahuan::index');
     $routes->post('pemberitahuan/simpan', 'ApiPemberitahuan::create');
-    $routes->get('pemberitahuan/edit/(:num)', 'ApiPemberitahuan::edit/$1');
-    $routes->post('pemberitahuan/update/(:num)', 'ApiPemberitahuan::update/$1');
-    $routes->delete('pemberitahuan/delete/(:num)', 'ApiPemberitahuan::delete/$1');
 
     // api pengaduan
     $routes->get('pengaduan', 'ApiPengaduan::index');
