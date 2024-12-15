@@ -70,6 +70,17 @@ class ApiKas extends ResourceController
             return $this->respond($data, 404);
         }else{
             $this->model->update($id_kas, ["publish" => 1]);
+            
+            $current_publish = $this->model->find($id_kas);
+            $bulans = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            $current_month = array_search($current_publish['bulan'], $bulans);
+            $next_month = $current_month == 11 ? $bulans[0] : $bulans[$current_month+1];
+            $next_kas = [
+                "bulan" => $next_month,
+                "tahun" => $current_publish['tahun']+1,
+            ];
+            
+            $this->model->insert($next_kas);
 
             $data = [
                 'status' => 200,
