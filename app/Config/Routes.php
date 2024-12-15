@@ -20,6 +20,7 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], function ($routes)
     $routes->get('kas', 'ApiKas::index');
     $routes->get('kas/last', 'ApiKas::lastData');
     $routes->get('kas/publish', 'ApiKas::publishData');
+    $routes->post('kas/publish/simpan', 'ApiKas::publish');
     $routes->get('kas/pemasukan', 'ApiKas::pemasukanData');
     $routes->get('kas/pengeluaran', 'ApiKas::pengeluaranData');
     $routes->post('kas/pemasukan/simpan', 'ApiKas::pemasukan');
