@@ -57,6 +57,30 @@ class ApiKas extends ResourceController
         return $this->respond($data, 200);
     }
 
+    public function publish()
+    {
+        $id_kas = $this->request->getVar('id_kas') ?? null;
+        if($id_kas == null){
+            $data = [
+                'status' => 404,
+                'error' => true,
+                'message' => 'ID Kas tidak ditemukan'
+            ];
+
+            return $this->respond($data, 404);
+        }else{
+            $this->model->update($id_kas, ["publish" => 1]);
+
+            $data = [
+                'status' => 200,
+                'error' => false,
+                'message' => 'Berhasil publish Kas'
+            ];
+
+            return $this->respond($data, 200);
+        }
+    }
+
     public function pemasukan()
     {
         if (!$this->validate([
