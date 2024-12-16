@@ -64,7 +64,7 @@ class ApiFasilitas extends ResourceController
             'jml'  => [
                 'rules' => 'required',
                 'errors' => [
-                    'required' => 'Jumlah fasilitas harus diisi.'
+                    'required' => 'Jumlah harus diisi.'
                 ]
             ],
             'foto'  => [
@@ -102,14 +102,15 @@ class ApiFasilitas extends ResourceController
             'foto'      => $newName,
             'status'    => $this->request->getVar('status')
         ];
-        return $this->model->insert($data);
+        $this->model->insert($data);
+        
         $response = [
             'status'    => 200,
             'error'     => false,
             'data'   => 'Data berhasil disimpan.'
         ];
 
-        return $this->respondCreated($response, 201);
+        return $this->respondCreated($response, 200);
     }
 
     /**
