@@ -8,7 +8,7 @@ class PengeluaranModel extends Model
 {
     protected $table            = 'pengeluaran';
     protected $primaryKey       = 'id_pengeluaran';
-    protected $allowedFields    = ['id_kas', 'jumlah', 'keterangan', 'foto'];
+    protected $allowedFields    = ['id_kas', 'jumlah', 'keterangan', 'foto', 'tgl'];
 
     // protected $useAutoIncrement = true;
     // protected $returnType       = 'array';

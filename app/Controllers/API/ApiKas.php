@@ -120,6 +120,7 @@ class ApiKas extends ResourceController
             'id_kas' => $this->request->getVar('id_kas'),
             'jumlah' => $this->request->getVar('jumlah'),
             'keterangan' => $this->request->getVar('keterangan') ?? null,
+            'tgl' => date('Y-m-d')
         ];
 
         $this->pemasukanModel->insert($data);
@@ -169,6 +170,7 @@ class ApiKas extends ResourceController
             'jumlah' => $this->request->getVar('jumlah'),
             'keterangan' => $this->request->getVar('keterangan') ?? null,
             'foto' => $namaFoto,
+            'tgl' => date('Y-m-d')
         ];
 
         $this->pengeluaranModel->insert($data);
