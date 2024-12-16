@@ -32,6 +32,27 @@ class ApiPengaduan extends ResourceController
 
         return $this->respond($data, 200);
     }
+    
+    public function warga($nik == null)
+    {
+        if ($nik == null) {
+            $data = [
+                'status' => 404,
+                'message' => 'failed',
+                'data' => "NIK warga tidak ditemukan"
+            ];
+            
+            return $this->respond($data, 404);
+        }else{
+            $data = [
+                'status' => 200,
+                'message' => 'success',
+                'data' => $this->PengaduanModel->where('nik', $nik)->get()->getResultArray()
+            ];
+
+            return $this->respond($data, 200);
+        }
+    }
 
     /**
      * Return the properties of a resource object.

@@ -49,6 +49,7 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], function ($routes)
     $routes->get('pengaduan', 'ApiPengaduan::index');
     $routes->post('pengaduan/simpan', 'ApiPengaduan::create');
     $routes->get('pengaduan/jenis/(:any)', 'ApiPengaduan::jenis/$1');
+    $routes->get('pengaduan/warga/(:any)', 'ApiPengaduan::warga/$1');
     $routes->post('pengaduan/balas', 'ApiPengaduan::balas');
 
     // api pengurus
