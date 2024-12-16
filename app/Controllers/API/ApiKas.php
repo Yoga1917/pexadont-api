@@ -24,10 +24,31 @@ class ApiKas extends ResourceController
     {
         $tahun = $this->request->getGet('tahun') ?? null;
 
+        if ($tahun == null) {
+            $kas_all = $this->model->get()->getResultArray();
+        }else{
+            $kas_all = $this->model->where('tahun', $tahun)->get()->getResultArray();
+        }
+
+        $kas_data = [];
+        foreach ($kas_all as $kas) {
+            $pemasukan = $this->pemasukanModel->where('id_kas', $kas['id_kas'])->selectSum('jumlah')->get()->getRowArray()['jumlah'];
+            $pengeluaran = $this->pengeluaranModel->where('id_kas', $kas['id_kas'])->selectSum('jumlah')->get()->getRowArray()['jumlah'];
+
+            array_push($kas_data, [
+                "id_kas" => $kas['id_kas'],
+                "bulan" => $kas['bulan'],
+                "tahun" => $kas['tahun'],
+                "publish" => $kas['publish'],
+                "pemasukan" => $pemasukan,
+                "pengeluaran" => $pengeluaran,
+            ]);
+        }
+
         $data = [
             'status' => 200,
             'message' => 'success',
-            'data' => $this->model->getAll($tahun),
+            'data' => $kas_data,
         ];
 
         return $this->respond($data, 200);
@@ -35,10 +56,17 @@ class ApiKas extends ResourceController
 
     public function lastData()
     {
+        $kas = $this->model->where('publish', 0)->get()->getRowArray();
+        $pemasukan = $this->pemasukanModel->where('id_kas', $kas['id_kas'])->selectSum('jumlah')->get()->getRowArray()['jumlah'];
+        $pengeluaran = $this->pengeluaranModel->where('id_kas', $kas['id_kas'])->selectSum('jumlah')->get()->getRowArray()['jumlah'];
+        
+        $kas["pemasukan"] = $pemasukan;
+        $kas["pengeluaran"] = $pengeluaran;
+
         $data = [
             'status' => 200,
             'message' => 'success',
-            'data' => $this->model->getLastData(),
+            'data' => $kas,
         ];
 
         return $this->respond($data, 200);
