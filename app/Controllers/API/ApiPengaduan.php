@@ -33,7 +33,7 @@ class ApiPengaduan extends ResourceController
         return $this->respond($data, 200);
     }
     
-    public function warga($nik == null)
+    public function warga($nik = null)
     {
         if ($nik == null) {
             $data = [
