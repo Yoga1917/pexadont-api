@@ -4,11 +4,11 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class AktifitasModel extends Model
+class RkbModel extends Model
 {
-    protected $table            = 'aktifitas';
-    protected $primaryKey       = 'id_aktifitas';
-    protected $allowedFields    = ['nama', 'deskripsi', 'keterangan', 'tgl&waktu'];
+    protected $table            = 'rkb';
+    protected $primaryKey       = 'id_rkb';
+    protected $allowedFields    = ['tgl', 'keterangan'];
 
     // protected $useAutoIncrement = true;
     // protected $returnType       = 'array';

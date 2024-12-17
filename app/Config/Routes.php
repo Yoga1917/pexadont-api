@@ -9,12 +9,9 @@ $routes->get('/', 'Home::index');
 
 // Api
 $routes->group('api', ['namespace' => 'App\Controllers\Api'], function ($routes) {
-    // api aktifitas
-    $routes->get('aktifitas', 'ApiAktifitas::index');
-    $routes->post('aktifitas/simpan', 'ApiAktifitas::create');
-    $routes->get('aktifitas/edit/(:num)', 'ApiAktifitas::edit/$1');
-    $routes->post('aktifitas/update/(:num)', 'ApiAktifitas::update/$1');
-    $routes->delete('aktifitas/delete/(:num)', 'ApiAktifitas::delete/$1');
+    // api rkb
+    $routes->get('rkb', 'ApiRkb::index');
+    $routes->post('rkb/simpan', 'ApiRkb::create');
 
     // api kas
     $routes->get('kas', 'ApiKas::index');
@@ -64,7 +61,7 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], function ($routes)
     $routes->post('warga/simpan', 'ApiWarga::create');
     $routes->get('warga/edit/(:num)', 'ApiWarga::edit/$1');
     $routes->post('warga/update/(:num)', 'ApiWarga::update/$1');
-    $routes->delete('warga/delete/(:num)', 'ApiWarga::delete/$1');
+    // $routes->delete('warga/delete/(:num)', 'ApiWarga::delete/$1');
     
     // check login
     $routes->get('login', 'ApiLogin::login');

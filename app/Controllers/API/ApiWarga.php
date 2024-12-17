@@ -263,53 +263,35 @@ class ApiWarga extends ResourceController
         return $this->respond($response, 202);
     }
 
-    /**
-     * Delete the designated resource object from the model.
-     *
-     * @param int|string|null $id
-     *
-     * @return ResponseInterface
-     */
-    public function delete($id = null)
-    {
-        $data = $this->model->find($id);
-        if ($data) {
-            $cekPengurus = $this->pengurusModel->where('nik', $id)->get()->getResultArray();
-            if(count($cekPengurus) > 0){
-                $response = [
-                    'status' => 400,
-                    'error' => true,
-                    'data' => 'Data warga ini tercatat sebagai '.$cekPengurus[0]['jabatan'].', hapus kepengurusan terlebih dahulu'
-                ];
-                return $this->respond($response, 400);
-            }else{
-                $this->model->delete($id);
-                unlink('uploads/warga/' . $data['foto']);
-                $response = [
-                    'status' => 203,
-                    'error' => false,
-                    'data' => 'Warga berhasil dihapus'
-                ];
-                return $this->respondDeleted($response, 203);
-            }
-        } else {
-            $response = [
-                'status' => 404,
-                'error' => true,
-                'data' => 'Warga tidak ditemukan'
-            ];
-            return $this->respond($response, 404);
-        }
-    }
-
-    public function simpanToken()
-    {
-        $token = $this->request->getVar('token'); // Token FCM yang diterima dari aplikasi
-
-        // Simpan token ke database
-        $wargaModel = new \App\Models\WargaModel();
-        $wargaModel->update($this->request->getVar('id'), ['fcm_token' => $token]);
-
-        return $this->response->setJSON(['status' => 'Token saved']);
-    }
+    // public function delete($id = null)
+    // {
+    //     $data = $this->model->find($id);
+    //     if ($data) {
+    //         $cekPengurus = $this->pengurusModel->where('nik', $id)->get()->getResultArray();
+    //         if(count($cekPengurus) > 0){
+    //             $response = [
+    //                 'status' => 400,
+    //                 'error' => true,
+    //                 'data' => 'Data warga ini tercatat sebagai '.$cekPengurus[0]['jabatan'].', hapus kepengurusan terlebih dahulu'
+    //             ];
+    //             return $this->respond($response, 400);
+    //         }else{
+    //             $this->model->delete($id);
+    //             unlink('uploads/warga/' . $data['foto']);
+    //             $response = [
+    //                 'status' => 203,
+    //                 'error' => false,
+    //                 'data' => 'Warga berhasil dihapus'
+    //             ];
+    //             return $this->respondDeleted($response, 203);
+    //         }
+    //     } else {
+    //         $response = [
+    //             'status' => 404,
+    //             'error' => true,
+    //             'data' => 'Warga tidak ditemukan'
+    //         ];
+    //         return $this->respond($response, 404);
+    //     }
+    // }
 }
