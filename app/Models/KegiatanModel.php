@@ -10,21 +10,6 @@ class KegiatanModel extends Model
     protected $primaryKey       = 'id_kegiatan';
     protected $allowedFields    = ['ketua_pelaksana', 'nama_kegiatan', 'keterangan', 'tgl', 'proposal', 'lpj'];
 
-    public function relasiWarga()
-    {
-        return $this->db->table('kegiatan')
-            ->join('warga', 'warga.nik = kegiatan.nik')
-            ->get()->getResultArray();
-    }
-
-    public function getKegiatan($id)
-    {
-        return $this->db->table('kegiatan')
-            ->join('warga', 'warga.nik = kegiatan.nik')
-            ->where('id_kegiatan', $id)
-            ->get()->getRowArray();
-    }
-
     // protected $useAutoIncrement = true;
     // protected $returnType       = 'array';
     // protected $useSoftDeletes   = false;
