@@ -31,12 +31,8 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], function ($routes)
 
     // api kegiatan
     $routes->get('kegiatan', 'ApiKegiatan::index');
-    $routes->post('kegiatan/tambah', 'ApiKegiatan::new');
     $routes->post('kegiatan/simpan', 'ApiKegiatan::create');
-    $routes->get('kegiatan/edit/(:num)', 'ApiKegiatan::edit/$1');
-    $routes->post('kegiatan/update/(:num)', 'ApiKegiatan::update/$1');
-    $routes->delete('kegiatan/delete/(:num)', 'ApiKegiatan::delete/$1');
-    $routes->get('kegiatan/updateLPJ/(:num)', 'ApiKegiatan::UpdateLPJ/$1');
+    $routes->post('kegiatan/lpj', 'ApiKegiatan::lpj');
 
     // api pemberitahuan
     $routes->get('pemberitahuan', 'ApiPemberitahuan::index');

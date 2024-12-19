@@ -66,21 +66,7 @@ class ApiPemberitahuan extends ResourceController
                 'errors' => [
                     'required' => 'Deskripsi harus diisi.'
                 ]
-            ],
-            'tgl' => [
-                'rules' => 'required',
-                'errors' => [
-                    'required' => 'Tanggal harus diisi.'
-                ]
-            ],
-            'file'  => [
-                'rules' => 'uploaded[file]|max_size[file,3072]|mime_in[file,application/pdf]',
-                'errors' => [
-                    'uploaded' => 'File pemberitahuan harus diisi.',
-                    'max_size' => 'Ukuran file pemberitahuan maksimal 3MB.',
-                    'mime_in' => 'Format file pemberitahuan harus PDF.'
-                ]
-            ],
+            ]
 
         ])) {
             $response = [
@@ -92,14 +78,18 @@ class ApiPemberitahuan extends ResourceController
         }
 
         $file = $this->request->getFile('file');
-        $newName = $file->getRandomName();
-        $file->move('uploads/pemberitahuan/', $newName);
+        if(is_null($file)){
+            $namaFile = null;
+        } else {
+            $namaFile = $file->getRandomName();
+            $file->move('uploads/pemberitahuan/', $namaFile);
+        }
 
         $data = [
             'pemberitahuan'  => $this->request->getVar('pemberitahuan'),
             'deskripsi'      => $this->request->getVar('deskripsi'),
-            'tgl'            => $this->request->getVar('tgl'),
-            'file'           => $newName
+            'tgl'            => date('Y-m-d'),
+            'file'           => $namaFile
         ];
 
         $this->model->insert($data);
@@ -108,6 +98,6 @@ class ApiPemberitahuan extends ResourceController
             'error' => false,
             'data' => 'Pemberitahuan berhasil ditambahkan'
         ];
-        return $this->respondCreated($response, 200);
+        return $this->respond($response, 200);
     }
 }

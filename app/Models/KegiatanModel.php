@@ -8,7 +8,7 @@ class KegiatanModel extends Model
 {
     protected $table            = 'kegiatan';
     protected $primaryKey       = 'id_kegiatan';
-    protected $allowedFields    = ['nik', 'nama_kegiatan', 'keterangan', 'tgl', 'proposal', 'lpj'];
+    protected $allowedFields    = ['ketua_pelaksana', 'nama_kegiatan', 'keterangan', 'tgl', 'proposal', 'lpj'];
 
     public function relasiWarga()
     {
