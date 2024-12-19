@@ -19,7 +19,7 @@ class ApiPemberitahuan extends ResourceController
         $data = [
             'status' => 200,
             'error' => false,
-            'data' => $this->model->findAll()
+            'data' => $this->model->orderBy('tgl', 'desc')->get()->getResultArray()
         ];
 
         return $this->respond($data, 200);
