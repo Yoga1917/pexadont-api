@@ -63,13 +63,13 @@ class ApiLogin extends ResourceController
 
         $data = $this->pengurusModel->relasiWargaBynik($nik);
         if($data){
-            $verify_pass = password_verify($password, $data[0]['password']);
+            $verify_pass = password_verify($password, $data['password']);
 
             if($verify_pass){
                 $response = [
                     'status' => 200,
                     'error' => false,
-                    'data' => $data[0]
+                    'data' => $data
                 ];
                 return $this->respond($response, 200);
             }else{
