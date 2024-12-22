@@ -89,4 +89,12 @@ class ApiLogin extends ResourceController
             return $this->respond($response, 404);
         }
     }
+
+    public function passwordReset(){
+        // logic reset password
+    }
+
+    public function passwordUbah(){
+        // logic ubah password
+    }
 }

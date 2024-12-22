@@ -62,4 +62,8 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], function ($routes)
     // check login
     $routes->get('login', 'ApiLogin::login');
     $routes->get('login/pengurus', 'ApiLogin::loginPengurus');
+    
+    // password modify
+    $routes->get('password/reset', 'ApiLogin::passwordReset');
+    $routes->post('password/ubah', 'ApiLogin::passwordUbah');
 });
