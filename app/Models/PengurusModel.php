@@ -22,7 +22,7 @@ class PengurusModel extends Model
         return $this->db->table('pengurus')
             ->join('warga', 'warga.nik = pengurus.nik')
             ->where('pengurus.nik', $nik)
-            ->get()->getResultArray();
+            ->get()->getRowArray();
     }
 
     // protected $useAutoIncrement = true;

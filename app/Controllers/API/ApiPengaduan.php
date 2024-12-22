@@ -3,6 +3,7 @@
 namespace App\Controllers\API;
 
 use App\Models\PengaduanModel;
+use App\Models\PengurusModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
@@ -10,6 +11,7 @@ class ApiPengaduan extends ResourceController
 {
     protected $format    = 'json';
     protected $PengaduanModel;
+    protected $PengurusModel;
     protected $WargaModel;
     /**
      * Return an array of resource objects, themselves in array format.
@@ -20,6 +22,7 @@ class ApiPengaduan extends ResourceController
     public function __construct()
     {
         $this->PengaduanModel = new PengaduanModel();
+        $this->PengurusModel = new PengurusModel();
     }
     
     public function index()
@@ -140,6 +143,7 @@ class ApiPengaduan extends ResourceController
         ];
 
         $this->PengaduanModel->insert($data);
+        $this->sendWhatsapp($data['jenis']);
 
         $response = [
             'status' => 201,
@@ -173,4 +177,93 @@ class ApiPengaduan extends ResourceController
             return $this->respond($data, 200);
         }
     }
+
+    
+    // helper func send whatsapp
+    private function sendWhatsapp($jenis_pengaduan){
+        switch ($jenis_pengaduan) {
+            case 'Kinerja':
+                $pengurus = $this->PengurusModel->where('jabatan', 'Ketua RT')->get()->getRowArray();
+                if(is_null($pengurus)){
+                    return;
+                }
+
+                $whatsapp = $this->PengurusModel->relasiWargaBynik($pengurus['nik'])['no_wa'];
+                $this->sendNotif($whatsapp, "Notifikasi Pengaduan Baru...\nJenis pengaduan : Kinerja\n\nSegera cek aplikasi pexadont RT 19");
+                break;
+            case 'Fasilitas':
+                $pengurus = $this->PengurusModel->where('jabatan', 'Ketua RT')->get()->getRowArray();
+                if(is_null($pengurus)){
+                    return;
+                }
+
+                $whatsapp = $this->PengurusModel->relasiWargaBynik($pengurus['nik'])['no_wa'];
+                $this->sendNotif($whatsapp, "Notifikasi Pengaduan Baru...\nJenis pengaduan : Fasilitas\n\nSegera cek aplikasi pexadont RT 19");
+                break;
+            case 'Kegiatan':
+                $pengurus = $this->PengurusModel->where('jabatan', 'Sekretaris')->get()->getRowArray();
+                if(is_null($pengurus)){
+                    return;
+                }
+
+                $whatsapp = $this->PengurusModel->relasiWargaBynik($pengurus['nik'])['no_wa'];
+                $this->sendNotif($whatsapp, "Notifikasi Pengaduan Baru...\nJenis pengaduan : Kegiatan\n\nSegera cek aplikasi pexadont RT 19");
+                break;
+            case 'Keuangan':
+                $pengurus = $this->PengurusModel->where('jabatan', 'Bendahara')->get()->getRowArray();
+                if(is_null($pengurus)){
+                    return;
+                }
+
+                $whatsapp = $this->PengurusModel->relasiWargaBynik($pengurus['nik'])['no_wa'];
+                $this->sendNotif($whatsapp, "Notifikasi Pengaduan Baru...\nJenis pengaduan : Keuangan\n\nSegera cek aplikasi pexadont RT 19");
+                break;
+            case 'Kebersihan':
+                $pengurus = $this->PengurusModel->where('jabatan', 'Kordinator Kebersihan')->get()->getRowArray();
+                if(is_null($pengurus)){
+                    return;
+                }
+
+                $whatsapp = $this->PengurusModel->relasiWargaBynik($pengurus['nik'])['no_wa'];
+                $this->sendNotif($whatsapp, "Notifikasi Pengaduan Baru...\nJenis pengaduan : Kebersihan\n\nSegera cek aplikasi pexadont RT 19");
+                break;
+            case 'Keamanan':
+                $pengurus = $this->PengurusModel->where('jabatan', 'Kordinator Keamanan')->get()->getRowArray();
+                if(is_null($pengurus)){
+                    return;
+                }
+
+                $whatsapp = $this->PengurusModel->relasiWargaBynik($pengurus['nik'])['no_wa'];
+                $this->sendNotif($whatsapp, "Notifikasi Pengaduan Baru...\nJenis pengaduan : Keamanan\n\nSegera cek aplikasi pexadont RT 19");
+                break;
+            default:
+                return;
+                break;
+        }
+    }
+
+    private function sendNotif($whatsapp, $text){
+        $token = "csVhjZFrHjuVWVwiZsRm";
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.fonnte.com/send',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => array(
+            'target' => $whatsapp,
+            'message' => $text,
+            'countryCode' => '62',
+        ),
+            CURLOPT_HTTPHEADER => array('Authorization: ' . $token),
+        ));
+
+        curl_exec($curl);
+        curl_close($curl);
+	}
 }
