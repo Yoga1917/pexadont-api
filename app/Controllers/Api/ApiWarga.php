@@ -218,9 +218,7 @@ class ApiWarga extends ResourceController
     }
 
     public function terima(){
-        if (!$this->validate([
-            'nik'  => ['rules' => 'required'],
-        ])) {
+        if ($this->request->getVar('nik') == null){
             $response = [
                 'status' => 404,
                 'error' => true,
@@ -243,10 +241,7 @@ class ApiWarga extends ResourceController
     }
 
     public function tolak(){
-        if (!$this->validate([
-            'nik'  => ['rules' => 'required'],
-            'keterangan'  => ['rules' => 'required'],
-        ])) {
+        if ($this->request->getVar('nik') == null || $this->request->getVar('keterangan') == null){
             $response = [
                 'status' => 404,
                 'error' => true,
