@@ -8,7 +8,16 @@ class KegiatanModel extends Model
 {
     protected $table            = 'kegiatan';
     protected $primaryKey       = 'id_kegiatan';
-    protected $allowedFields    = ['ketua_pelaksana', 'nama_kegiatan', 'keterangan', 'tgl', 'proposal', 'lpj'];
+    protected $allowedFields    = ['nik', 'nama_kegiatan', 'keterangan', 'tgl', 'proposal', 'lpj'];
+
+    public function relasiWarga()
+    {
+        return $this->db->table('kegiatan')
+            ->join('warga', 'warga.nik = kegiatan.nik')
+            ->select('kegiatan.*, warga.nama as ketua_pelaksana')
+            ->orderBy('kegiatan.tgl', 'desc')
+            ->get()->getResultArray();
+    }
 
     // protected $useAutoIncrement = true;
     // protected $returnType       = 'array';

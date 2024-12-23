@@ -24,7 +24,7 @@ class ApiKegiatan extends ResourceController
         $data = [
             'status'    => 200,
             'error'     => false,
-            'data'      => $this->KegiatanModel->orderBy('tgl', 'desc')->get()->getResultArray()
+            'data'      => $this->KegiatanModel->relasiWarga()
         ];
 
         return $this->respond($data, 200);
@@ -33,7 +33,7 @@ class ApiKegiatan extends ResourceController
     public function create()
     {
         if (!$this->validate([
-            'ketua_pelaksana' => [
+            'nik' => [
                 'rules' => 'required',
                 'errors' => ['required' => 'NIK Warga Harus Diisi']
             ],
@@ -77,7 +77,7 @@ class ApiKegiatan extends ResourceController
         $proposal->move('uploads/kegiatan/proposal/', $namaProposal);
 
         $data = [
-            'ketua_pelaksana' => $this->request->getPost('ketua_pelaksana'),
+            'nik'             => $this->request->getPost('nik'),
             'nama_kegiatan'   => $this->request->getPost('nama_kegiatan'),
             'keterangan'      => $this->request->getPost('keterangan'),
             'tgl'             => $this->request->getPost('tgl'),
