@@ -122,7 +122,7 @@ class ApiPengaduan extends ResourceController
                 "Keamanan" => $this->PengurusModel->getByJabatan("Kordinator Keamanan"),
             ];
             
-            $pengaduans = $this->PengaduanModel->findByJenis($jenis)
+            $pengaduans = $this->PengaduanModel->findByJenis($jenis);
             $pengaduanFixs = [];
             foreach ($pengaduans as $p) {
                 array_push($pengaduanFixs, [
