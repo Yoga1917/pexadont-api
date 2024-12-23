@@ -4,6 +4,7 @@ namespace App\Controllers\API;
 
 use App\Models\PemasukanModel;
 use App\Models\PengeluaranModel;
+use App\Models\PengurusModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
@@ -13,15 +14,18 @@ class ApiKas extends ResourceController
     protected $format    = 'json';
     protected $pemasukanModel;
     protected $pengeluaranModel;
+    protected $pengurusModel;
     
     public function __construct()
     {
         $this->pemasukanModel = new PemasukanModel();
         $this->pengeluaranModel = new PengeluaranModel();
+        $this->pengurusModel = new PengurusModel();
     }
 
     public function index()
     {
+        $aksiBy = $this->pengurusModel->getByJabatan("Bendahara");
         $tahun = $this->request->getGet('tahun') ?? null;
 
         if ($tahun == null) {
@@ -49,6 +53,7 @@ class ApiKas extends ResourceController
             'status' => 200,
             'message' => 'success',
             'data' => $kas_data,
+            'aksiBy' => $aksiBy['nama'] ." (". $aksiBy['jabatan'] . ")",
         ];
 
         return $this->respond($data, 200);

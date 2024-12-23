@@ -2,6 +2,7 @@
 
 namespace App\Controllers\API;
 
+use App\Models\PengurusModel;
 use App\Models\RkbModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
@@ -10,14 +11,17 @@ class ApiRkb extends ResourceController
 {
     protected $format    = 'json';
     protected $rkbModel;
+    protected $pengurusModel;
     
     public function __construct()
     {
         $this->rkbModel = new RkbModel();
+        $this->pengurusModel = new PengurusModel();
     }
     
     public function index()
     {
+        $aksiBy = $this->pengurusModel->getByJabatan("Sekretaris");
         $tahun = $this->request->getVar('tahun') ?? date('Y');
         $bulans = [
             ["date" => "12", "name" => "Desember"],
@@ -51,7 +55,8 @@ class ApiRkb extends ResourceController
         $data = [
             'status'        => 200,
             'message'       => 'success',
-            'data'          => $datas
+            'data'          => $datas,
+            'aksiBy' => $aksiBy['nama'] ." (". $aksiBy['jabatan'] . ")",
         ];
 
         return $this->respond($data, 200);

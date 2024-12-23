@@ -2,6 +2,7 @@
 
 namespace App\Controllers\API;
 
+use App\Models\PengurusModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
@@ -9,17 +10,21 @@ class ApiPemberitahuan extends ResourceController
 {
     protected $modelName = 'App\Models\PemberitahuanModel';
     protected $format    = 'json';
-    /**
-     * Return an array of resource objects, themselves in array format.
-     *
-     * @return ResponseInterface
-     */
+    protected $pengurusModel;
+    
+    public function __construct()
+    {
+        $this->pengurusModel = new PengurusModel();
+    }
+
     public function index()
     {
+        $aksiBy = $this->pengurusModel->getByJabatan("Sekretaris");
         $data = [
             'status' => 200,
             'error' => false,
-            'data' => $this->model->orderBy('tgl', 'desc')->get()->getResultArray()
+            'data' => $this->model->orderBy('tgl', 'desc')->get()->getResultArray(),
+            'aksiBy' => $aksiBy['nama'] ." (". $aksiBy['jabatan'] . ")",
         ];
 
         return $this->respond($data, 200);

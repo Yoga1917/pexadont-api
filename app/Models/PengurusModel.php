@@ -26,6 +26,15 @@ class PengurusModel extends Model
             ->get()->getRowArray();
     }
 
+    public function getByJabatan($jabatan)
+    {
+        return $this->db->table('pengurus')
+            ->join('warga', 'warga.nik = pengurus.nik')
+            ->where('pengurus.jabatan', $jabatan)
+            ->orderBy('pengurus.id_pengurus', 'desc')
+            ->get()->getRowArray();
+    }
+
     // protected $useAutoIncrement = true;
     // protected $returnType       = 'array';
     // protected $useSoftDeletes   = false;
