@@ -4,6 +4,7 @@ namespace App\Controllers\API;
 
 use App\Models\PengaduanModel;
 use App\Models\PengurusModel;
+use App\Models\WargaModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
@@ -23,6 +24,7 @@ class ApiPengaduan extends ResourceController
     {
         $this->PengaduanModel = new PengaduanModel();
         $this->PengurusModel = new PengurusModel();
+        $this->WargaModel = new WargaModel();
     }
     
     public function index()
@@ -164,16 +166,25 @@ class ApiPengaduan extends ResourceController
             
             return $this->respond($data, 404);
         }else{
+            // update
             $this->PengaduanModel->update($this->request->getVar('id_pengaduan'), [
                 "balasan" => $this->request->getVar('balasan'),
             ]);
+            
+            // notif
+            $pengaduan = $this->PengaduanModel->find($this->request->getVar('id_pengaduan'));
+            $whatsapp = $this->WargaModel->find($pengaduan['nik'])['no_wa'];
+            return $this->sendNotif(
+                $whatsapp,
+                "Pengaduan anda di aplikasi Pexadont sudah dibalas...\nJenis pengaduan : ".$pengaduan['jenis']."\nTanggal Pengaduan : ".$pengaduan['tgl']."\nBalasan : " . $this->request->getVar('balasan')
+            );
 
+            // respond
             $data = [
                 'status' => 200,
                 'message' => 'success',
                 'data' => "Balasan pengaduan berhasil disimpan"
             ];
-
             return $this->respond($data, 200);
         }
     }
