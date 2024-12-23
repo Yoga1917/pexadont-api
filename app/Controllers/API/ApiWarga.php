@@ -17,11 +17,6 @@ class ApiWarga extends ResourceController
         $this->pengurusModel = new PengurusModel();
     }
 
-    /**
-     * Return an array of resource objects, themselves in array format.
-     *
-     * @return ResponseInterface
-     */
     public function index()
     {
         $data = [
@@ -33,33 +28,6 @@ class ApiWarga extends ResourceController
         return $this->respond($data, 200);
     }
 
-    /**
-     * Return the properties of a resource object.
-     *
-     * @param int|string|null $id
-     *
-     * @return ResponseInterface
-     */
-    public function show($id = null)
-    {
-        //
-    }
-
-    /**
-     * Return a new resource object, with default properties.
-     *
-     * @return ResponseInterface
-     */
-    public function new()
-    {
-        //
-    }
-
-    /**
-     * Create a new resource object, from "posted" parameters.
-     *
-     * @return ResponseInterface
-     */
     public function create()
     {
         if (!$this->validate([
@@ -155,13 +123,6 @@ class ApiWarga extends ResourceController
         return $this->respondCreated($response, 200);
     }
 
-    /**
-     * Return the editable properties of a resource object.
-     *
-     * @param int|string|null $id
-     *
-     * @return ResponseInterface
-     */
     public function edit($id = null)
     {
         $data = $this->model->find($id);
@@ -181,14 +142,7 @@ class ApiWarga extends ResourceController
             return $this->respond($response, 404);
         }
     }
-
-    /**
-     * Add or update a model resource, from "posted" properties.
-     *
-     * @param int|string|null $id
-     *
-     * @return ResponseInterface
-     */
+    
     public function update($id = null)
     {
         if (!$this->validate([
@@ -263,35 +217,83 @@ class ApiWarga extends ResourceController
         return $this->respond($response, 202);
     }
 
-    // public function delete($id = null)
-    // {
-    //     $data = $this->model->find($id);
-    //     if ($data) {
-    //         $cekPengurus = $this->pengurusModel->where('nik', $id)->get()->getResultArray();
-    //         if(count($cekPengurus) > 0){
-    //             $response = [
-    //                 'status' => 400,
-    //                 'error' => true,
-    //                 'data' => 'Data warga ini tercatat sebagai '.$cekPengurus[0]['jabatan'].', hapus kepengurusan terlebih dahulu'
-    //             ];
-    //             return $this->respond($response, 400);
-    //         }else{
-    //             $this->model->delete($id);
-    //             unlink('uploads/warga/' . $data['foto']);
-    //             $response = [
-    //                 'status' => 203,
-    //                 'error' => false,
-    //                 'data' => 'Warga berhasil dihapus'
-    //             ];
-    //             return $this->respondDeleted($response, 203);
-    //         }
-    //     } else {
-    //         $response = [
-    //             'status' => 404,
-    //             'error' => true,
-    //             'data' => 'Warga tidak ditemukan'
-    //         ];
-    //         return $this->respond($response, 404);
-    //     }
-    // }
+    public function terima(){
+        if (!$this->validate([
+            'nik'  => ['rules' => 'required'],
+        ])) {
+            $response = [
+                'status' => 404,
+                'error' => true,
+                'data' => 'NIK warga tidak ditemukan'
+            ];
+            return $this->respond($response, 404);
+        }
+        // update status
+        $this->model->update($this->request->getVar('nik'), ['status' => 1]);
+        // send notif
+        $warga = $this->model->find($this->request->getVar('nik'));
+        $this->sendNotif($warga['no_wa'], "Halo ".$warga['nama']."...\nPendaftaran anda di aplikasi Pexadont sudah diterima, sekarang anda sudah bisa login dan akses semua fitur.");
+
+        $response = [
+            'status' => 200,
+            'error' => false,
+            'data' => 'Pendaftaran warga berhasil diterima'
+        ];
+        return $this->respond($response, 200);
+    }
+
+    public function tolak(){
+        if (!$this->validate([
+            'nik'  => ['rules' => 'required'],
+            'keterangan'  => ['rules' => 'required'],
+        ])) {
+            $response = [
+                'status' => 404,
+                'error' => true,
+                'data' => 'Data NIK dan keterangan penolakan pendaftaran diperlukan'
+            ];
+            return $this->respond($response, 404);
+        }
+        // send notif
+        $warga = $this->model->find($this->request->getVar('nik'));
+        $this->sendNotif(
+            $warga['no_wa'],
+            "Halo ".$warga['nama']."...\nPendaftaran anda di aplikasi Pexadont ditolak.\n\nKeterangan :\n" . $this->request->getVar('keterangan')
+        );
+        // delete warga
+        $this->model->delete($this->request->getVar('nik'));
+
+        $response = [
+            'status' => 200,
+            'error' => false,
+            'data' => 'Pendaftaran warga ditolak'
+        ];
+        return $this->respond($response, 200);
+    }
+
+    // helper func
+    private function sendNotif($whatsapp, $text){
+        $token = "csVhjZFrHjuVWVwiZsRm";
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.fonnte.com/send',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => array(
+            'target' => $whatsapp,
+            'message' => $text,
+            'countryCode' => '62',
+        ),
+            CURLOPT_HTTPHEADER => array('Authorization: ' . $token),
+        ));
+
+        curl_exec($curl);
+        curl_close($curl);
+	}
 }

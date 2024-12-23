@@ -57,7 +57,8 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], function ($routes)
     $routes->post('warga/simpan', 'ApiWarga::create');
     $routes->get('warga/edit/(:num)', 'ApiWarga::edit/$1');
     $routes->post('warga/update/(:num)', 'ApiWarga::update/$1');
-    // $routes->delete('warga/delete/(:num)', 'ApiWarga::delete/$1');
+    $routes->get('warga/terima', 'ApiWarga::terima');
+    $routes->get('warga/tolak', 'ApiWarga::tolak');
     
     // check login
     $routes->get('login', 'ApiLogin::login');
