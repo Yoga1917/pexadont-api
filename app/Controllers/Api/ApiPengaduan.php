@@ -29,10 +29,28 @@ class ApiPengaduan extends ResourceController
     
     public function index()
     {
+        $aksiBy = [
+            "Kinerja" => $this->PengurusModel->getByJabatan("Ketua RT"),
+            "Fasilitas" => $this->PengurusModel->getByJabatan("Ketua RT"),
+            "Kegiatan" => $this->PengurusModel->getByJabatan("Sekretaris"),
+            "Keuangan" => $this->PengurusModel->getByJabatan("Bendahara"),
+            "Kebersihan" => $this->PengurusModel->getByJabatan("Kordinator Kebersihan"),
+            "Keamanan" => $this->PengurusModel->getByJabatan("Kordinator Keamanan"),
+        ];
+        
+        $pengaduans = $this->PengaduanModel->relasiWarga();
+        $pengaduanFixs = [];
+        foreach ($pengaduans as $p) {
+            array_push($pengaduanFixs, [
+                ...$p,
+                "aksiBy" => $aksiBy[$p['jenis']]['nama'] ." (". $aksiBy[$p['jenis']]['jabatan'] . ")"
+            ]);
+        }
+
         $data = [
             'status' => 200,
             'message' => 'Success',
-            'data' => $this->PengaduanModel->relasiWarga()
+            'data' => $pengaduanFixs
         ];
 
         return $this->respond($data, 200);
