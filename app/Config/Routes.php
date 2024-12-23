@@ -48,9 +48,7 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], function ($routes)
     // api pengurus
     $routes->get('pengurus', 'ApiPengurus::index');
     $routes->post('pengurus/simpan', 'ApiPengurus::create');
-    $routes->get('pengurus/edit/(:num)', 'ApiPengurus::edit/$1');
-    $routes->post('pengurus/update/(:num)', 'ApiPengurus::edit/$1');
-    $routes->delete('pengurus/delete/(:num)', 'ApiPengurus::delete/$1');
+    $routes->get('pengurus/show/(:num)', 'ApiPengurus::show/$1');
 
     // api warga
     $routes->get('warga', 'ApiWarga::index');

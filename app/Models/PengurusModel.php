@@ -8,12 +8,13 @@ class PengurusModel extends Model
 {
     protected $table            = 'pengurus';
     protected $primaryKey       = 'id_pengurus';
-    protected $allowedFields    = ['nik', 'jabatan'];
+    protected $allowedFields    = ['nik', 'jabatan', 'periode'];
 
-    public function relasiWarga()
+    public function relasiWarga($periode)
     {
         return $this->db->table('pengurus')
             ->join('warga', 'warga.nik = pengurus.nik')
+            ->where('pengurus.periode', $periode)
             ->get()->getResultArray();
     }
 
