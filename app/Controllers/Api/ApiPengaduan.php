@@ -192,7 +192,7 @@ class ApiPengaduan extends ResourceController
             // notif
             $pengaduan = $this->PengaduanModel->find($this->request->getVar('id_pengaduan'));
             $whatsapp = $this->WargaModel->find($pengaduan['nik'])['no_wa'];
-            return $this->sendNotif(
+            $this->sendNotif(
                 $whatsapp,
                 "Pengaduan anda di aplikasi Pexadont sudah dibalas...\nJenis pengaduan : ".$pengaduan['jenis']."\nTanggal Pengaduan : ".$pengaduan['tgl']."\nBalasan : " . $this->request->getVar('balasan')
             );
