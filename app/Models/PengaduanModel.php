@@ -14,7 +14,7 @@ class PengaduanModel extends Model
     {
         return $this->db->table('pengaduan')
             ->join('warga', 'warga.nik = pengaduan.nik')
-            ->select('id_pengaduan, pengaduan.nik, pengaduan.isi, pengaduan.foto, pengaduan.tgl, pengaduan.jenis, pengaduan.balasan, warga.nama')
+            ->select('id_pengaduan, pengaduan.nik, pengaduan.isi, pengaduan.foto, pengaduan.tgl, pengaduan.jenis, pengaduan.balasan, warga.nama, warga.foto as foto_warga') // ini yang ditambahkan
             ->get()->getResultArray();
     }
 

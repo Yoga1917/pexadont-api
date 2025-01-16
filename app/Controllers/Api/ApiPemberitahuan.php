@@ -25,6 +25,7 @@ class ApiPemberitahuan extends ResourceController
             'error' => false,
             'data' => $this->model->orderBy('tgl', 'desc')->get()->getResultArray(),
             'aksiBy' => $aksiBy['nama'] ." (". $aksiBy['jabatan'] . ")",
+            'fotoAksiBy' => $aksiBy['foto'] // ini yang ditambahkan
         ];
 
         return $this->respond($data, 200);

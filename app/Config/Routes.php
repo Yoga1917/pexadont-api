@@ -49,6 +49,7 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], function ($routes)
     $routes->get('pengurus', 'ApiPengurus::index');
     $routes->post('pengurus/simpan', 'ApiPengurus::create');
     $routes->get('pengurus/show/(:num)', 'ApiPengurus::show/$1');
+    $routes->post('pengurus/update/(:num)', 'ApiPengurus::updateStatus/$1'); // ini yang ditambahkan
 
     // api warga
     $routes->get('warga', 'ApiWarga::index');

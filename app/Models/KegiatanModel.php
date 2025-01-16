@@ -14,7 +14,7 @@ class KegiatanModel extends Model
     {
         return $this->db->table('kegiatan')
             ->join('warga', 'warga.nik = kegiatan.nik')
-            ->select('kegiatan.*, warga.nama as ketua_pelaksana')
+            ->select('kegiatan.*, warga.nama as ketua_pelaksana, warga.foto as foto_ketua_pelaksana') // ini yang ditambahkan
             ->orderBy('kegiatan.tgl', 'desc')
             ->get()->getResultArray();
     }
