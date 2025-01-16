@@ -54,6 +54,7 @@ class ApiKas extends ResourceController
             'message' => 'success',
             'data' => $kas_data,
             'aksiBy' => $aksiBy['nama'] ." (". $aksiBy['jabatan'] . ")",
+            'fotoAksiBy' => $aksiBy['foto'] // ini yang ditambahkan
         ];
 
         return $this->respond($data, 200);

@@ -26,6 +26,7 @@ class ApiFasilitas extends ResourceController
             'message'   => 'Success',
             'data'      => $this->model->findAll(),
             'aksiBy'    => $aksiBy['nama'] ." (". $aksiBy['jabatan'] . ")",
+            'fotoAksiBy' => $aksiBy['foto'] // ini yang ditambahkan
         ];
 
         return $this->respond($data, 200);
