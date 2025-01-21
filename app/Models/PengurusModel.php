@@ -8,7 +8,7 @@ class PengurusModel extends Model
 {
     protected $table            = 'pengurus';
     protected $primaryKey       = 'id_pengurus';
-    protected $allowedFields    = ['nik', 'jabatan', 'periode'];
+    protected $allowedFields    = ['nik', 'jabatan', 'periode', 'status_pengurus']; // ini yang ditambahkan
 
     public function relasiWarga($periode)
     {

@@ -81,6 +81,7 @@ class ApiPengurus extends ResourceController
             'nik' => $this->request->getPost('nik'),
             'jabatan' => $this->request->getPost('jabatan'),
             'periode' => $this->request->getPost('periode'),
+            'status_pengurus' => 1 // ini yang ditambahkan
         ];
         $this->PengurusModel->insert($data);
 
@@ -96,6 +97,29 @@ class ApiPengurus extends ResourceController
             'data' => 'Data Pengurus Berhasil Ditambahkan',
         ];
         return $this->respond($response, 201);
+    }
+
+    public function updateStatus($nik = null) // ini yang ditambahkan
+    {
+        $data = $this->PengurusModel->where('nik', $nik)->get()->getRowArray();
+        if(empty($data)) {
+            $response = [
+                'status' => 404,
+                'error' => true,
+                'data' => 'Data Pengurus tidak ditemukan'
+            ];
+            return $this->respond($response, 404);
+        }
+
+        $status = $data['status_pengurus'] == 1 ? 2 : 1;
+        $this->PengurusModel->update($data['id_pengurus'], ['status_pengurus' => $status]);
+
+        $response = [
+            'status' => 200,
+            'error' => false,
+            'data' => 'Status Pengurus Berhasil Diubah',
+        ];
+        return $this->respond($response, 200);
     }
 
     public function show($nik = null)

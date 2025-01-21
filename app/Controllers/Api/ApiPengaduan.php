@@ -43,7 +43,8 @@ class ApiPengaduan extends ResourceController
         foreach ($pengaduans as $p) {
             array_push($pengaduanFixs, [
                 ...$p,
-                "aksiBy" => $aksiBy[$p['jenis']]['nama'] ." (". $aksiBy[$p['jenis']]['jabatan'] . ")"
+                "aksiBy" => $aksiBy[$p['jenis']]['nama'] ." (". $aksiBy[$p['jenis']]['jabatan'] . ")",
+                "fotoAksiBy" => $aksiBy[$p['jenis']]['foto']
             ]);
         }
 
@@ -81,7 +82,8 @@ class ApiPengaduan extends ResourceController
             foreach ($pengaduans as $p) {
                 array_push($pengaduanFixs, [
                     ...$p,
-                    "aksiBy" => $aksiBy[$p['jenis']]['nama'] ." (". $aksiBy[$p['jenis']]['jabatan'] . ")"
+                    "aksiBy" => $aksiBy[$p['jenis']]['nama'] ." (". $aksiBy[$p['jenis']]['jabatan'] . ")",
+                    'fotoAksiBy' => $aksiBy[$p['jenis']['foto']] // ini yang ditambahkan
                 ]);
             }
 
@@ -127,7 +129,8 @@ class ApiPengaduan extends ResourceController
             foreach ($pengaduans as $p) {
                 array_push($pengaduanFixs, [
                     ...$p,
-                    "aksiBy" => $aksiBy[$p['jenis']]['nama'] ." (". $aksiBy[$p['jenis']]['jabatan'] . ")"
+                    "aksiBy" => $aksiBy[$p['jenis']]['nama'] ." (". $aksiBy[$p['jenis']]['jabatan'] . ")",
+                    "fotoAksiBy" => $aksiBy[$p['jenis']]['foto']
                 ]);
             }
 
