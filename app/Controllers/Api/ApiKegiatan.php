@@ -3,6 +3,7 @@
 namespace App\Controllers\API;
 
 use App\Models\KegiatanModel;
+use App\Models\PengurusModel;
 use App\Models\WargaModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
@@ -10,6 +11,7 @@ use CodeIgniter\RESTful\ResourceController;
 class ApiKegiatan extends ResourceController
 {
     protected $KegiatanModel;
+    protected $pengurusModel;
     protected $WargaModel;
     protected $format = 'json';
 
@@ -17,14 +19,19 @@ class ApiKegiatan extends ResourceController
     {
         $this->KegiatanModel    = new KegiatanModel();
         $this->WargaModel       = new WargaModel();
+        $this->pengurusModel = new PengurusModel();
     }
     
     public function index()
     {
+        $aksiBy = $this->pengurusModel->getByJabatan("Sekretaris");
+
         $data = [
             'status'    => 200,
             'error'     => false,
-            'data'      => $this->KegiatanModel->relasiWarga()
+            'data'      => $this->KegiatanModel->relasiWarga(),
+            'aksiBy' => $aksiBy['nama'] ." (". $aksiBy['jabatan'] . ")",
+            'fotoAksiBy' => $aksiBy['foto']
         ];
 
         return $this->respond($data, 200);
