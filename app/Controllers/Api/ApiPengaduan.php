@@ -80,12 +80,21 @@ class ApiPengaduan extends ResourceController
             $pengaduans = $this->PengaduanModel->where('nik', $nik)->get()->getResultArray();
             $pengaduanFixs = [];
             foreach ($pengaduans as $p) {
-                array_push($pengaduanFixs, [
-                    ...$p,
-                    "aksiBy" => $aksiBy[$p['jenis']]['nama'] ." (". $aksiBy[$p['jenis']]['jabatan'] . ")",
-                    'fotoAksiBy' => $aksiBy[$p['jenis']['foto']] // ini yang ditambahkan
-                ]);
-            }
+                if (isset($aksiBy[$p['jenis']])) {
+                    $aksiData = $aksiBy[$p['jenis']];
+                    array_push($pengaduanFixs, [
+                        ...$p,
+                        "aksiBy" => $aksiData['nama'] . " (" . $aksiData['jabatan'] . ")",
+                        'fotoAksiBy' => isset($aksiData['foto']) ? $aksiData['foto'] : null 
+                    ]);
+                } else {
+                    array_push($pengaduanFixs, [
+                        ...$p,
+                        "aksiBy" => "Data tidak ditemukan.",
+                        'fotoAksiBy' => null
+                    ]);
+                }
+            }            
 
             $data = [
                 'status' => 200,
