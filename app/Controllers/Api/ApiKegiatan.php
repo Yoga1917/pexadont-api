@@ -56,12 +56,6 @@ class ApiKegiatan extends ResourceController
                     'required'      => 'Keterangan Harus Diisi',
                 ]
             ],
-            'tgl' => [
-                'rules'     => 'required',
-                'errors'    => [
-                    'required'      => 'Tanggal Harus Diisi',
-                ]
-            ],
             'proposal' => [
                 'rules'     => 'uploaded[proposal]|ext_in[proposal,pdf]',
                 'errors'    => [
@@ -87,7 +81,7 @@ class ApiKegiatan extends ResourceController
             'nik'             => $this->request->getPost('nik'),
             'nama_kegiatan'   => $this->request->getPost('nama_kegiatan'),
             'keterangan'      => $this->request->getPost('keterangan'),
-            'tgl'             => $this->request->getPost('tgl'),
+            'tgl'             => date('Y-m-d'),
             'proposal'        => $namaProposal,
         ];
 
