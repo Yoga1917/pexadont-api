@@ -115,6 +115,21 @@ class ApiWarga extends ResourceController
         ];
 
         $this->model->insert($data);
+
+        $sekretaris = $this->pengurusModel->getByJabatan('Sekretaris');
+        if ($sekretaris) {
+            $whatsappSekretaris = $sekretaris['no_wa'] ?? ''; 
+        } else {
+            $whatsappSekretaris = '';
+        }
+
+        if ($whatsappSekretaris) {
+            $this->sendNotif(
+                $whatsappSekretaris,
+                "Halo Sekretaris RT,..\n\nAda pendaftaran akun warga baru\nSilahkan masuk ke aplikasi untuk mengecek data dan mengkonfirmasi akun warga."
+            );
+        }
+
         $response = [
             'status' => 200,
             'error' => false,
