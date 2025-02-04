@@ -99,9 +99,9 @@ class ApiPengurus extends ResourceController
         return $this->respond($response, 201);
     }
 
-    public function updateStatus($nik = null) // ini yang ditambahkan
+    public function updateStatus($id_pengurus = null) // ini yang ditambahkan
     {
-        $data = $this->PengurusModel->where('nik', $nik)->get()->getRowArray();
+        $data = $this->PengurusModel->where('id_pengurus', $id_pengurus)->get()->getRowArray();
         if(empty($data)) {
             $response = [
                 'status' => 404,
@@ -112,7 +112,7 @@ class ApiPengurus extends ResourceController
         }
 
         $status = $data['status_pengurus'] == 1 ? 2 : 1;
-        $this->PengurusModel->update($data['id_pengurus'], ['status_pengurus' => $status]);
+        $this->PengurusModel->update($id_pengurus, ['status_pengurus' => $status]);
 
         $response = [
             'status' => 200,
