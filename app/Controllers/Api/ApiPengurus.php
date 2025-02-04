@@ -35,91 +35,52 @@ class ApiPengurus extends ResourceController
 
     public function create()
     {
-        if (!$this->validate([
-            'nik'   => [
-                'rules' => 'required',
-                'errors' => [
-                    'required' => 'NIK Wajib Diisi',
-                ]
-            ],
-            'jabatan'   => [
-                'rules' => 'required',
-                'errors' => [
-                    'required' => 'Jabatan Wajib Diisi',
-                ]
-            ]
-        ])) {
-            $response = [
-                'status' => 400,
-                'error' => true,
-                'message' => $this->validator->getErrors()
-            ];
-            return $this->respond($response, 400);
+        $nik = $this->request->getPost('nik');
+        $jabatan = $this->request->getPost('jabatan');
+        $periode = $this->request->getPost('periode');
+
+        $cekNik = $this->PengurusModel
+            ->where('nik', $nik)
+            ->where('periode', $periode)
+            ->findAll();
+
+        if (count($cekNik) > 0) {
+            return $this->respond(['status' => 400, 'error' => true, 'message' => 'Pengurus dengan NIK ini sudah ada di periode tersebut'], 400);
         }
 
-        $cekNik = $this->PengurusModel->where('nik', $this->request->getPost('nik'))->where('periode', $this->request->getPost('periode'))->get()->getResultArray();
-        if(count($cekNik) > 0){
-            $response = [
-                'status' => 400,
-                'error' => true,
-                'data' => 'Pengurus dengan NIK di periode tersebut sudah tersedia'
-            ];
-            return $this->respond($response, 400);
+        $cekJabatan = $this->PengurusModel
+            ->where('jabatan', $jabatan)
+            ->where('periode', $periode)
+            ->findAll();
+
+        if (count($cekJabatan) > 0) {
+            return $this->respond(['status' => 400, 'error' => true, 'message' => 'Jabatan ini sudah ada di periode tersebut'], 400);
         }
-        
-        $cekJabatan = $this->PengurusModel->where('jabatan', $this->request->getPost('jabatan'))->where('periode', $this->request->getPost('periode'))->get()->getResultArray();
-        if(count($cekJabatan) > 0){
-            $response = [
-                'status' => 400,
-                'error' => true,
-                'data' => 'Pengurus dengan jabatan '.$this->request->getPost('jabatan').' di periode tersebut sudah tersedia'
-            ];
-            return $this->respond($response, 400);
-        }        
 
         $data = [
-            'nik' => $this->request->getPost('nik'),
-            'jabatan' => $this->request->getPost('jabatan'),
-            'periode' => $this->request->getPost('periode'),
-            'status_pengurus' => 1 // ini yang ditambahkan
+            'nik' => $nik,
+            'jabatan' => $jabatan,
+            'periode' => $periode,
+            'status_pengurus' => 1 
         ];
+
         $this->PengurusModel->insert($data);
-
-        $whatsapp = $this->WargaModel->find($this->request->getPost('nik'))['no_wa'];
-        $this->sendNotif(
-            $whatsapp,
-            "Notifikasi Kepengurusan Baru\n\nAnda sekarang terdaftar sebagai pengurus di aplikasi Pexadont RT 19.\nJabatan : " . $data['jabatan'] . "\nPeriode : " . $data['periode']
-        );
-
-        $response = [
-            'status' => 201,
-            'error' => false,
-            'data' => 'Data Pengurus Berhasil Ditambahkan',
-        ];
-        return $this->respond($response, 201);
+        return $this->respond(['status' => 201, 'message' => 'Pengurus berhasil ditambahkan'], 201);
     }
 
-    public function updateStatus($nik = null) // ini yang ditambahkan
+    public function updateStatus()
     {
-        $data = $this->PengurusModel->where('nik', $nik)->get()->getRowArray();
-        if(empty($data)) {
-            $response = [
-                'status' => 404,
-                'error' => true,
-                'data' => 'Data Pengurus tidak ditemukan'
-            ];
-            return $this->respond($response, 404);
+        $nik = $this->request->getVar('nik');
+        $periode = $this->request->getVar('periode');
+        $status_pengurus = $this->request->getVar('status_pengurus');
+
+        if (!$nik || !$periode) {
+            return $this->response->setJSON(['status' => false, 'message' => 'NIK dan Periode harus diisi']);
         }
 
-        $status = $data['status_pengurus'] == 1 ? 2 : 1;
-        $this->PengurusModel->update($data['id_pengurus'], ['status_pengurus' => $status]);
+        $this->PengurusModel->updateStatusByNikPeriode($nik, $periode, $status_pengurus);
 
-        $response = [
-            'status' => 200,
-            'error' => false,
-            'data' => 'Status Pengurus Berhasil Diubah',
-        ];
-        return $this->respond($response, 200);
+        return $this->response->setJSON(['status' => true, 'message' => 'Status pengurus berhasil diperbarui']);
     }
 
     public function show($nik = null)
@@ -139,6 +100,24 @@ class ApiPengurus extends ResourceController
             'data' => $data
         ];
         return $this->respond($response, 200);
+    }
+
+    public function login()
+    {
+        $nik = $this->request->getPost('nik');
+        $password = $this->request->getPost('password');
+
+        $pengurus = $this->PengurusModel->getActivePengurus($nik); // (5) Hanya mengambil pengurus aktif
+
+        if (!$pengurus) {
+            return $this->respond(['status' => 403, 'error' => true, 'message' => 'Anda bukan pengurus aktif'], 403);
+        }
+
+        if (!password_verify($password, $pengurus['password'])) {
+            return $this->respond(['status' => 401, 'error' => true, 'message' => 'Password salah'], 401);
+        }
+
+        return $this->respond(['status' => 200, 'message' => 'Login berhasil', 'data' => $pengurus], 200);
     }
 
     // notif

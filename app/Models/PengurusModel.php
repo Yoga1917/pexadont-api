@@ -35,6 +35,32 @@ class PengurusModel extends Model
             ->get()->getRowArray();
     }
 
+    public function getActivePengurus($nik) 
+    {
+        return $this->db->table('pengurus')
+            ->join('warga', 'warga.nik = pengurus.nik')
+            ->where('pengurus.nik', $nik)
+            ->where('pengurus.status_pengurus', 1) 
+            ->get()->getRowArray();
+    }
+
+    public function updateStatusByNikPeriode($nik, $periode, $status_pengurus)
+    {
+        return $this->db->table('pengurus')
+            ->where('nik', $nik)
+            ->where('periode', $periode) 
+            ->set(['status_pengurus' => $status_pengurus])
+            ->update();
+    }
+
+    public function getByNikAndPeriode($nik, $periode)
+    {
+        return $this->db->table('pengurus')
+            ->where('nik', $nik)
+            ->where('periode', $periode)
+            ->get()->getRowArray();
+    }
+
     // protected $useAutoIncrement = true;
     // protected $returnType       = 'array';
     // protected $useSoftDeletes   = false;
