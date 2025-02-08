@@ -61,30 +61,45 @@ class ApiLogin extends ResourceController
         $nik = $this->request->getVar('nik');
         $password = $this->request->getVar('password');
 
-        $data = $this->pengurusModel->relasiWargaBynik($nik);
-        if($data){
-            $verify_pass = password_verify($password, $data['password']);
+        // Ambil data pengurus dan gabungkan dengan data warga untuk mendapatkan password
+        $data = $this->pengurusModel
+                    ->where('nik', $nik)
+                    ->orderBy('id_pengurus', 'desc')
+                    ->first();
 
-            if($verify_pass){
+        if ($data) {
+            $warga = $this->model->find($data['nik']);
+            // Pastikan password dari warga tersedia
+            if (!isset($warga['password'])) {
+                return $this->respond([
+                    'status' => 500,
+                    'error' => true,
+                    'message' => 'Password tidak ditemukan dalam data warga.'
+                ], 500);
+            }
+
+            $verify_pass = password_verify($password, $warga['password']);
+
+            if ($verify_pass) {
                 $response = [
                     'status' => 200,
                     'error' => false,
                     'data' => $data
                 ];
                 return $this->respond($response, 200);
-            }else{
+            } else {
                 $response = [
                     'status' => 401,
                     'error' => true,
-                    'data' => 'Informasi login tidak cocok!'
+                    'message' => 'Informasi login tidak cocok!'
                 ];
                 return $this->respond($response, 401);
             }
-        }else{
+        } else {
             $response = [
                 'status' => 404,
                 'error' => true,
-                'data' => 'Data pengurus tidak ditemukan'
+                'message' => 'Data pengurus tidak ditemukan'
             ];
             return $this->respond($response, 404);
         }
