@@ -8,7 +8,17 @@ class KasModel extends Model
 {
     protected $table            = 'kas';
     protected $primaryKey       = 'id_kas';
-    protected $allowedFields    = ['bulan', 'tahun', 'publish'];
+    protected $allowedFields    = ['bulan', 'tahun', 'publish', 'id_pengurus'];
+
+    public function getKasWithPengurus()
+    {
+        return $this->db->table('kas')
+            ->select('kas.*, warga.nama as aksiBy, warga.foto as fotoAksiBy')
+            ->join('pengurus', 'pengurus.id_pengurus = kas.id_pengurus', 'left')
+            ->join('warga', 'warga.nik = pengurus.nik', 'left') // Join ke tabel warga
+            ->get()
+            ->getResultArray();
+    }
 
     // protected $useAutoIncrement = true;
     // protected $returnType       = 'array';

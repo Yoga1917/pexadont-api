@@ -2,7 +2,6 @@
 
 namespace App\Controllers\API;
 
-use App\Models\PengurusModel;
 use App\Models\RkbModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
@@ -11,17 +10,14 @@ class ApiRkb extends ResourceController
 {
     protected $format    = 'json';
     protected $rkbModel;
-    protected $pengurusModel;
     
     public function __construct()
     {
         $this->rkbModel = new RkbModel();
-        $this->pengurusModel = new PengurusModel();
     }
     
     public function index()
     {
-        $aksiBy = $this->pengurusModel->getByJabatan("Sekretaris");
         $tahun = $this->request->getVar('tahun') ?? date('Y');
         $bulans = [
             ["date" => "12", "name" => "Desember"],
@@ -40,24 +36,25 @@ class ApiRkb extends ResourceController
 
         $datas = [];
         foreach ($bulans as $bulan) {
-            array_push(
-                $datas,
-                [
-                    "bulan" => $bulan['name'] ." ". $tahun,
-                    "data" => $this->rkbModel->where('year(tgl)', $tahun)
-                                             ->where('month(tgl)', date("m",strtotime($tahun."-".$bulan['date'])))
-                                             ->get()
-                                             ->getResultArray()
-                ]
-            );
+            $dataKegiatan = $this->rkbModel
+                ->select('rkb.*, pengurus.id_pengurus, warga.nama as aksiBy, warga.foto as fotoAksiBy')
+                ->join('pengurus', 'pengurus.id_pengurus = rkb.id_pengurus', 'left')
+                ->join('warga', 'warga.nik = pengurus.nik', 'left')
+                ->where('YEAR(tgl)', $tahun)
+                ->where('MONTH(tgl)', $bulan['date'])
+                ->findAll();
+
+            // Tambahkan ke array response
+            $datas[] = [
+                "bulan" => $bulan['name'] . " " . $tahun,
+                "data" => $dataKegiatan
+            ];
         }
 
         $data = [
             'status'        => 200,
             'message'       => 'success',
-            'data'          => $datas,
-            'aksiBy' => $aksiBy['nama'] ." (". $aksiBy['jabatan'] . ")",
-            'fotoAksiBy' => $aksiBy['foto'] // ini yang ditambahkan
+            'data'          => $datas
         ];
 
         return $this->respond($data, 200);
@@ -77,6 +74,12 @@ class ApiRkb extends ResourceController
                 'errors' => [
                     'required' => 'Keterangan harus diisi'
                 ]
+            ],
+            'id_pengurus'  => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'id_pengurus harus diisi.'
+                ]
             ]
         ])) {
             $response = [
@@ -90,6 +93,7 @@ class ApiRkb extends ResourceController
         $data = [
             'tgl' => $this->request->getPost('tgl'),
             'keterangan' => $this->request->getPost('keterangan'),
+            'id_pengurus' => $this->request->getPost('id_pengurus'),
         ];
 
         $this->rkbModel->insert($data);

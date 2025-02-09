@@ -8,7 +8,18 @@ class PemberitahuanModel extends Model
 {
     protected $table            = 'pemberitahuan';
     protected $primaryKey       = 'id_pemberitahuan';
-    protected $allowedFields    = ['pemberitahuan', 'deskripsi', 'tgl', 'file'];
+    protected $allowedFields    = ['pemberitahuan', 'deskripsi', 'tgl', 'file', 'id_pengurus'];
+
+    public function getPemberitahuanWithPengurus()
+    {
+        return $this->db->table('pemberitahuan')
+            ->select('pemberitahuan.*, warga.nama as aksiBy, warga.foto as fotoAksiBy')
+            ->join('pengurus', 'pengurus.id_pengurus = pemberitahuan.id_pengurus', 'left')
+            ->join('warga', 'warga.nik = pengurus.nik', 'left') // Join ke tabel warga
+            ->orderBy('tgl', 'desc')
+            ->get()
+            ->getResultArray();
+    }
 
     // protected $useAutoIncrement = true;
     // protected $returnType       = 'array';

@@ -2,34 +2,25 @@
 
 namespace App\Controllers\API;
 
-use App\Models\PengurusModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
 class ApiFasilitas extends ResourceController
 {
     protected $modelName = 'App\Models\FasilitasModel';
-    protected $pengurusModel;
     protected $format    = 'json';
  
-    public function __construct()
-    {
-        $this->pengurusModel = new PengurusModel();
-    }
-
     public function index()
     {
-        $aksiBy = $this->pengurusModel->getByJabatan("Ketua RT");
+        $data = $this->model->getFasilitasWithPengurus();
 
-        $data = [
+        $response = [
             'status'    => 200,
             'message'   => 'Success',
-            'data'      => $this->model->findAll(),
-            'aksiBy'    => $aksiBy['nama'] ." (". $aksiBy['jabatan'] . ")",
-            'fotoAksiBy' => $aksiBy['foto'] // ini yang ditambahkan
+            'data'      => $data
         ];
 
-        return $this->respond($data, 200);
+        return $this->respond($response, 200);
     }
 
     public function create()
@@ -61,6 +52,12 @@ class ApiFasilitas extends ResourceController
                 'errors' => [
                     'required' => 'Status fasilitas harus diisi.'
                 ]
+            ],
+            'id_pengurus'  => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'id_pengurus harus diisi.'
+                ]
             ]
         ])) {
             $response = [
@@ -80,7 +77,8 @@ class ApiFasilitas extends ResourceController
             'nama'      => $this->request->getVar('nama'),
             'jml'       => $this->request->getVar('jml'),
             'foto'      => $newName,
-            'status'    => $this->request->getVar('status')
+            'status'    => $this->request->getVar('status'),
+            'id_pengurus'    => $this->request->getVar('id_pengurus')
         ];
         $this->model->insert($data);
         
@@ -133,6 +131,12 @@ class ApiFasilitas extends ResourceController
                 'errors' => [
                     'required' => 'Status fasilitas harus diisi.'
                 ]
+            ],
+            'id_pengurus'  => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'id_pengurus harus diisi.'
+                ]
             ]
         ])) {
             $response = [
@@ -146,14 +150,15 @@ class ApiFasilitas extends ResourceController
         $data = [
             'nama'      => $this->request->getVar('nama'),
             'jml'       => $this->request->getVar('jml'),
-            'status'    => $this->request->getVar('status')
+            'status'    => $this->request->getVar('status'),
+            'id_pengurus'    => $this->request->getVar('id_pengurus')
         ];
 
         $this->model->update($id, $data);
         $response = [
             'status' => 202,
             'error' => false,
-            'data' => 'Fasilitas berhasil diupdate'
+            'data' => 'Fasilitas berhasil diperbarui!'
         ];
         return $this->respond($response, 202);
     }

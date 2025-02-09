@@ -8,7 +8,7 @@ class RkbModel extends Model
 {
     protected $table            = 'rkb';
     protected $primaryKey       = 'id_rkb';
-    protected $allowedFields    = ['tgl', 'keterangan'];
+    protected $allowedFields    = ['tgl', 'keterangan', 'id_pengurus'];
 
     // protected $useAutoIncrement = true;
     // protected $returnType       = 'array';

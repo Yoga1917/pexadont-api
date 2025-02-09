@@ -4,7 +4,6 @@ namespace App\Controllers\API;
 
 use App\Models\PemasukanModel;
 use App\Models\PengeluaranModel;
-use App\Models\PengurusModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
@@ -14,24 +13,24 @@ class ApiKas extends ResourceController
     protected $format    = 'json';
     protected $pemasukanModel;
     protected $pengeluaranModel;
-    protected $pengurusModel;
     
     public function __construct()
     {
         $this->pemasukanModel = new PemasukanModel();
         $this->pengeluaranModel = new PengeluaranModel();
-        $this->pengurusModel = new PengurusModel();
     }
 
     public function index()
     {
-        $aksiBy = $this->pengurusModel->getByJabatan("Bendahara");
         $tahun = $this->request->getGet('tahun') ?? null;
 
         if ($tahun == null) {
-            $kas_all = $this->model->get()->getResultArray();
+            $kas_all = $this->model->getKasWithPengurus(); 
         }else{
-            $kas_all = $this->model->where('tahun', $tahun)->get()->getResultArray();
+            $kas_all = $this->model->getKasWithPengurus(); 
+            $kas_all = array_filter($kas_all, function ($kas) use ($tahun) {
+                return $kas['tahun'] == $tahun;
+            });
         }
 
         $kas_data = [];
@@ -44,6 +43,9 @@ class ApiKas extends ResourceController
                 "bulan" => $kas['bulan'],
                 "tahun" => $kas['tahun'],
                 "publish" => $kas['publish'],
+                "id_pengurus" => $kas['id_pengurus'],
+                "aksiBy" => $kas['aksiBy'],
+                "fotoAksiBy" => $kas['fotoAksiBy'],
                 "pemasukan" => $pemasukan,
                 "pengeluaran" => $pengeluaran,
             ]);
@@ -52,9 +54,7 @@ class ApiKas extends ResourceController
         $data = [
             'status' => 200,
             'message' => 'success',
-            'data' => $kas_data,
-            'aksiBy' => $aksiBy['nama'] ." (". $aksiBy['jabatan'] . ")",
-            'fotoAksiBy' => $aksiBy['foto'] // ini yang ditambahkan
+            'data' => $kas_data
         ];
 
         return $this->respond($data, 200);
@@ -94,7 +94,9 @@ class ApiKas extends ResourceController
     public function publish()
     {
         $id_kas = $this->request->getVar('id_kas') ?? null;
-        if($id_kas == null){
+        $id_pengurus = $this->request->getVar('id_pengurus') ?? null;
+
+        if($id_kas == null || $id_pengurus == null) {
             $data = [
                 'status' => 404,
                 'error' => true,
@@ -103,7 +105,7 @@ class ApiKas extends ResourceController
 
             return $this->respond($data, 404);
         }else{
-            $this->model->update($id_kas, ["publish" => 1]);
+            $this->model->update($id_kas, ["publish" => 1, "id_pengurus" => $id_pengurus]);
             
             $current_publish = $this->model->find($id_kas);
             $bulans = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -112,6 +114,7 @@ class ApiKas extends ResourceController
             $next_kas = [
                 "bulan" => $next_month,
                 "tahun" => $current_publish['tahun']+1,
+                "id_pengurus" => null,
             ];
             
             $this->model->insert($next_kas);
@@ -119,7 +122,7 @@ class ApiKas extends ResourceController
             $data = [
                 'status' => 200,
                 'error' => false,
-                'message' => 'Berhasil publish Kas'
+                'message' => 'Berhasil publish Kas!'
             ];
 
             return $this->respond($data, 200);

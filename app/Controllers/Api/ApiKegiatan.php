@@ -3,7 +3,6 @@
 namespace App\Controllers\API;
 
 use App\Models\KegiatanModel;
-use App\Models\PengurusModel;
 use App\Models\WargaModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
@@ -11,7 +10,6 @@ use CodeIgniter\RESTful\ResourceController;
 class ApiKegiatan extends ResourceController
 {
     protected $KegiatanModel;
-    protected $pengurusModel;
     protected $WargaModel;
     protected $format = 'json';
 
@@ -19,19 +17,16 @@ class ApiKegiatan extends ResourceController
     {
         $this->KegiatanModel    = new KegiatanModel();
         $this->WargaModel       = new WargaModel();
-        $this->pengurusModel = new PengurusModel();
     }
     
     public function index()
     {
-        $aksiBy = $this->pengurusModel->getByJabatan("Sekretaris");
+        $kegiatan = $this->KegiatanModel->getKegiatanWithPengurus();
 
         $data = [
             'status'    => 200,
             'error'     => false,
-            'data'      => $this->KegiatanModel->relasiWarga(),
-            'aksiBy' => $aksiBy['nama'] ." (". $aksiBy['jabatan'] . ")",
-            'fotoAksiBy' => $aksiBy['foto']
+            'data'      => $kegiatan
         ];
 
         return $this->respond($data, 200);
@@ -63,6 +58,12 @@ class ApiKegiatan extends ResourceController
                     'ext_in'        => 'File Proposal Harus Berformat PDF'
                 ]
             ],
+            'id_pengurus'  => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'id_pengurus harus diisi.'
+                ]
+            ]
         ])) {
             $data = [
                 'status'    => 400,
@@ -83,6 +84,7 @@ class ApiKegiatan extends ResourceController
             'keterangan'      => $this->request->getPost('keterangan'),
             'tgl'             => date('Y-m-d'),
             'proposal'        => $namaProposal,
+            'id_pengurus'     => $this->request->getPost('id_pengurus'),
         ];
 
         $this->KegiatanModel->insert($data);
@@ -109,6 +111,12 @@ class ApiKegiatan extends ResourceController
                     'ext_in'        => 'File LPJ Harus Berformat PDF'
                 ]
             ],
+            'id_pengurus'  => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'id_pengurus harus diisi.'
+                ]
+            ]
         ])) {
             $data = [
                 'status'    => 400,
@@ -124,7 +132,8 @@ class ApiKegiatan extends ResourceController
         $lpj->move('uploads/kegiatan/lpj/', $namaLpj);
         
         $this->KegiatanModel->update($this->request->getPost('id_kegiatan'), [
-            'lpj' => $namaLpj
+            'lpj'             => $namaLpj,
+            'id_pengurus'     => $this->request->getPost('id_pengurus'),
         ]);
 
         $response = [

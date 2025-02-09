@@ -2,7 +2,6 @@
 
 namespace App\Controllers\API;
 
-use App\Models\PengurusModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
@@ -10,22 +9,15 @@ class ApiPemberitahuan extends ResourceController
 {
     protected $modelName = 'App\Models\PemberitahuanModel';
     protected $format    = 'json';
-    protected $pengurusModel;
-    
-    public function __construct()
-    {
-        $this->pengurusModel = new PengurusModel();
-    }
 
     public function index()
     {
-        $aksiBy = $this->pengurusModel->getByJabatan("Sekretaris");
+        $pemberitahuan = $this->model->getPemberitahuanWithPengurus();
+        
         $data = [
             'status' => 200,
             'error' => false,
-            'data' => $this->model->orderBy('tgl', 'desc')->get()->getResultArray(),
-            'aksiBy' => $aksiBy['nama'] ." (". $aksiBy['jabatan'] . ")",
-            'fotoAksiBy' => $aksiBy['foto'] // ini yang ditambahkan
+            'data' => $pemberitahuan
         ];
 
         return $this->respond($data, 200);
@@ -72,8 +64,13 @@ class ApiPemberitahuan extends ResourceController
                 'errors' => [
                     'required' => 'Deskripsi harus diisi.'
                 ]
+            ],
+            'id_pengurus'  => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'id_pengurus harus diisi.'
+                ]
             ]
-
         ])) {
             $response = [
                 'status' => 400,
@@ -95,7 +92,8 @@ class ApiPemberitahuan extends ResourceController
             'pemberitahuan'  => $this->request->getVar('pemberitahuan'),
             'deskripsi'      => $this->request->getVar('deskripsi'),
             'tgl'            => date('Y-m-d'),
-            'file'           => $namaFile
+            'file'           => $namaFile,
+            'id_pengurus'    => $this->request->getVar('id_pengurus')
         ];
 
         $this->model->insert($data);

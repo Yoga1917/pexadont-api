@@ -8,7 +8,7 @@ class KegiatanModel extends Model
 {
     protected $table            = 'kegiatan';
     protected $primaryKey       = 'id_kegiatan';
-    protected $allowedFields    = ['nik', 'nama_kegiatan', 'keterangan', 'tgl', 'proposal', 'lpj'];
+    protected $allowedFields    = ['nik', 'nama_kegiatan', 'keterangan', 'tgl', 'proposal', 'lpj', 'id_pengurus'];
 
     public function relasiWarga()
     {
@@ -17,6 +17,16 @@ class KegiatanModel extends Model
             ->select('kegiatan.*, warga.nama as ketua_pelaksana, warga.foto as foto_ketua_pelaksana') // ini yang ditambahkan
             ->orderBy('kegiatan.tgl', 'desc')
             ->get()->getResultArray();
+    }
+
+    public function getKegiatanWithPengurus()
+    {
+        return $this->db->table('kegiatan')
+            ->select('kegiatan.*, warga.nama as aksiBy, warga.foto as fotoAksiBy')
+            ->join('pengurus', 'pengurus.id_pengurus = kegiatan.id_pengurus', 'left')
+            ->join('warga', 'warga.nik = pengurus.nik', 'left') // Join ke tabel warga
+            ->get()
+            ->getResultArray();
     }
 
     // protected $useAutoIncrement = true;

@@ -8,7 +8,17 @@ class FasilitasModel extends Model
 {
     protected $table            = 'fasilitas';
     protected $primaryKey       = 'id_fasilitas';
-    protected $allowedFields    = ['nama', 'jml', 'foto', 'status'];
+    protected $allowedFields    = ['nama', 'jml', 'foto', 'status', 'id_pengurus'];
+
+    public function getFasilitasWithPengurus()
+    {
+        return $this->db->table('fasilitas')
+            ->select('fasilitas.*, warga.nama as aksiBy, warga.foto as fotoAksiBy')
+            ->join('pengurus', 'pengurus.id_pengurus = fasilitas.id_pengurus', 'left')
+            ->join('warga', 'warga.nik = pengurus.nik', 'left') // Join ke tabel warga
+            ->get()
+            ->getResultArray();
+    }
 
     // protected $useAutoIncrement = true;
     // protected $returnType       = 'array';
