@@ -40,8 +40,8 @@ class ApiRkb extends ResourceController
                 ->select('rkb.*, pengurus.id_pengurus, warga.nama as aksiBy, warga.foto as fotoAksiBy')
                 ->join('pengurus', 'pengurus.id_pengurus = rkb.id_pengurus', 'left')
                 ->join('warga', 'warga.nik = pengurus.nik', 'left')
-                ->where('YEAR(tgl)', $tahun)
-                ->where('MONTH(tgl)', $bulan['date'])
+                ->where('year(tgl)', $tahun)
+                ->where('month(tgl)', date("m",strtotime($tahun."-".$bulan['date'])))
                 ->findAll();
 
             // Tambahkan ke array response
