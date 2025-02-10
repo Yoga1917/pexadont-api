@@ -21,7 +21,7 @@ class ApiKegiatan extends ResourceController
     
     public function index()
     {
-        $kegiatan = $this->KegiatanModel->getKegiatanWithPengurus();
+        $kegiatan = $this->KegiatanModel->getKegiatanLengkap();
 
         $data = [
             'status'    => 200,

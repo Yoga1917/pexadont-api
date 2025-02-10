@@ -29,6 +29,23 @@ class KegiatanModel extends Model
             ->getResultArray();
     }
 
+    public function getKegiatanLengkap()
+    {
+        $kegiatanRelasiWarga = $this->relasiWarga();
+        $kegiatanWithPengurus = $this->getKegiatanWithPengurus();
+
+        // Gabungkan dua hasil query berdasarkan ID Kegiatan
+        foreach ($kegiatanRelasiWarga as &$kegiatan) {
+            foreach ($kegiatanWithPengurus as $pengurus) {
+                if ($kegiatan['id_kegiatan'] == $pengurus['id_kegiatan']) {
+                    $kegiatan['aksiBy'] = $pengurus['aksiBy'];
+                    $kegiatan['fotoAksiBy'] = $pengurus['fotoAksiBy'];
+                }
+            }
+        }
+        return $kegiatanRelasiWarga;
+    }
+
     // protected $useAutoIncrement = true;
     // protected $returnType       = 'array';
     // protected $useSoftDeletes   = false;
