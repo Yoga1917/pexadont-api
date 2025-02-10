@@ -105,7 +105,7 @@ class ApiKas extends ResourceController
 
             return $this->respond($data, 404);
         }else{
-            $this->model->update($id_kas, ["publish" => 1, "id_pengurus" => $id_pengurus ?? null]);
+            $this->model->update($id_kas, ["publish" => 1, "id_pengurus" => $id_pengurus]);
             
             $current_publish = $this->model->find($id_kas);
             $bulans = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
