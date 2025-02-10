@@ -36,19 +36,19 @@ class ApiRkb extends ResourceController
 
         $datas = [];
         foreach ($bulans as $bulan) {
-            $dataKegiatan = $this->rkbModel
-                ->select('rkb.*, pengurus.id_pengurus, warga.nama as aksiBy, warga.foto as fotoAksiBy')
-                ->join('pengurus', 'pengurus.id_pengurus = rkb.id_pengurus', 'left')
-                ->join('warga', 'warga.nik = pengurus.nik', 'left')
-                ->where('year(tgl)', $tahun)
-                ->where('month(tgl)', date("m",strtotime($tahun."-".$bulan['date'])))
-                ->findAll();
-
-            // Tambahkan ke array response
-            $datas[] = [
-                "bulan" => $bulan['name'] . " " . $tahun,
-                "data" => $dataKegiatan
-            ];
+            array_push(
+                $datas,
+                [
+                    "bulan" => $bulan['name'] ." ". $tahun,
+                    "data" => $this->rkbModel->where('year(tgl)', $tahun)
+                                             ->where('month(tgl)', date("m",strtotime($tahun."-".$bulan['date'])))
+                                             ->select('rkb.*, pengurus.id_pengurus, warga.nama as aksiBy, warga.foto as fotoAksiBy')
+                                            ->join('pengurus', 'pengurus.id_pengurus = rkb.id_pengurus', 'left')
+                                            ->join('warga', 'warga.nik = pengurus.nik', 'left')
+                                             ->get()
+                                             ->getResultArray()
+                ]
+            );
         }
 
         $data = [
