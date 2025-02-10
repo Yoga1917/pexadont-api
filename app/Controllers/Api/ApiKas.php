@@ -94,7 +94,7 @@ class ApiKas extends ResourceController
     public function publish()
     {
         $id_kas = $this->request->getVar('id_kas') ?? null;
-        $id_pengurus = $this->request->getVar('id_pengurus') ?? null;
+        $id_pengurus = $this->request->getJSON(true)['id_pengurus'] ?? null; 
 
         if($id_kas == null || $id_pengurus == null) {
             $data = [
