@@ -14,14 +14,14 @@ class PengaduanModel extends Model
     {
         return $this->db->table('pengaduan')
             ->join('warga', 'warga.nik = pengaduan.nik')
-            ->select('id_pengaduan, pengaduan.nik, pengaduan.isi, pengaduan.foto, pengaduan.tgl, pengaduan.jenis, pengaduan.balasan, warga.nama, warga.foto as foto_warga') // ini yang ditambahkan
+            ->select('id_pengaduan, pengaduan.nik, pengaduan.isi, pengaduan.foto, pengaduan.tgl, pengaduan.jenis, pengaduan.balasan, warga.nama, warga.foto as foto_warga', 'pengaduan.id_pengurus') // ini yang ditambahkan
             ->get()->getResultArray();
     }
 
     public function getPengaduanWithPengurus()
     {
         return $this->db->table('pengaduan')
-        ->select('pengaduan.*, pengurus.id_pengurus, warga.nama as aksiBy, warga.foto as fotoAksiBy')
+        ->select('pengaduan.*, pengaduan.id_pengurus, warga.nama as aksiBy, warga.foto as fotoAksiBy')
             ->join('pengurus', 'pengurus.id_pengurus = pengaduan.id_pengurus', 'left')
             ->join('warga', 'warga.nik = pengurus.nik', 'left') // Join ke tabel warga
             ->get()->getResultArray();
