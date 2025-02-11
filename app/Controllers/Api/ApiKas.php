@@ -105,6 +105,14 @@ class ApiKas extends ResourceController
 
             return $this->respond($data, 404);
         }else{
+            if ($id_pengurus === null) {
+                return $this->respond([
+                    'status' => 400,
+                    'error' => true,
+                    'message' => 'ID Pengurus tidak boleh null'
+                ], 400);
+            }            
+
             $this->model->update($id_kas, ["publish" => 1, "id_pengurus" => $id_pengurus]);
             
             $current_publish = $this->model->find($id_kas);
