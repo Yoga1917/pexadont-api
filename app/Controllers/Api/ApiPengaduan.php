@@ -112,24 +112,36 @@ class ApiPengaduan extends ResourceController
             ];
             
             return $this->respond($data, 404);
-        }else{
-            $aksiBy = [
-                "Kinerja" => $this->PengurusModel->getByJabatan("Ketua RT"),
-                "Fasilitas" => $this->PengurusModel->getByJabatan("Ketua RT"),
-                "Kegiatan" => $this->PengurusModel->getByJabatan("Sekretaris"),
-                "Keuangan" => $this->PengurusModel->getByJabatan("Bendahara"),
-                "Kebersihan" => $this->PengurusModel->getByJabatan("Kordinator Kebersihan"),
-                "Keamanan" => $this->PengurusModel->getByJabatan("Kordinator Keamanan"),
-            ];
-            
-            $pengaduans = $this->PengaduanModel->findByJenis($jenis);
+        } else {
+            // Ambil semua pengaduan berdasarkan jenis pengaduan
+            $pengaduans = $this->PengaduanModel->where('jenis', $jenis)->get()->getResultArray();
             $pengaduanFixs = [];
+
             foreach ($pengaduans as $p) {
-                array_push($pengaduanFixs, [
-                    ...$p,
-                    "aksiBy" => $aksiBy[$p['jenis']]['nama'] ." (". $aksiBy[$p['jenis']]['jabatan'] . ")",
-                    "fotoAksiBy" => $aksiBy[$p['jenis']]['foto']
-                ]);
+                // Ambil ID pengurus yang membalas pengaduan
+                $idPengurus = $p['id_pengurus']; 
+
+                $pengurusData = $this->PengurusModel->where('id_pengurus', $idPengurus)->first();
+
+                if ($pengurusData) {
+                    // Dapatkan NIK pengurus dari tabel pengurus
+                    $nikPengurus = $pengurusData['nik'];
+                
+                    // Cari data pengurus dari tabel warga berdasarkan NIK yang ditemukan
+                    $pengurus = $this->WargaModel->where('nik', $nikPengurus)->first();
+                    
+                    array_push($pengaduanFixs, [
+                        ...$p,
+                        "aksiBy" => $pengurus ? $pengurus['nama'] : "Data pengurus tidak ditemukan.",
+                        'fotoAksiBy' => $pengurus ? $pengurus['foto'] : null
+                    ]);
+                } else {
+                    array_push($pengaduanFixs, [
+                        ...$p,
+                        "aksiBy" => "Data pengurus tidak ditemukan.",
+                        'fotoAksiBy' => null
+                    ]);
+                }
             }
 
             $data = [
@@ -137,6 +149,7 @@ class ApiPengaduan extends ResourceController
                 'message' => 'success',
                 'data' => $pengaduanFixs
             ];
+
             return $this->respond($data, 200);
         }
     }
