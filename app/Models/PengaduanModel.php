@@ -8,7 +8,7 @@ class PengaduanModel extends Model
 {
     protected $table            = 'pengaduan';
     protected $primaryKey       = 'id_pengaduan';
-    protected $allowedFields    = ['id_pengaduan', 'nik', 'isi', 'foto', 'tgl', 'jenis', 'balasan'];
+    protected $allowedFields    = ['id_pengaduan', 'nik', 'isi', 'foto', 'tgl', 'jenis', 'balasan', 'id_pengurus'];
 
     public function relasiWarga()
     {

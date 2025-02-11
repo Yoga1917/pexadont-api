@@ -58,53 +58,59 @@ class ApiPengaduan extends ResourceController
     }
     
     public function warga($nik = null)
-    {
-        if ($nik == null) {
-            $data = [
-                'status' => 404,
-                'message' => 'failed',
-                'data' => "NIK warga tidak ditemukan"
-            ];
-            
-            return $this->respond($data, 404);
-        }else{
-            $aksiBy = [
-                "Kinerja" => $this->PengurusModel->getByJabatan("Ketua RT"),
-                "Fasilitas" => $this->PengurusModel->getByJabatan("Ketua RT"),
-                "Kegiatan" => $this->PengurusModel->getByJabatan("Sekretaris"),
-                "Keuangan" => $this->PengurusModel->getByJabatan("Bendahara"),
-                "Kebersihan" => $this->PengurusModel->getByJabatan("Kordinator Kebersihan"),
-                "Keamanan" => $this->PengurusModel->getByJabatan("Kordinator Keamanan"),
-            ];
-            
-            $pengaduans = $this->PengaduanModel->where('nik', $nik)->get()->getResultArray();
-            $pengaduanFixs = [];
-            foreach ($pengaduans as $p) {
-                if (isset($aksiBy[$p['jenis']])) {
-                    $aksiData = $aksiBy[$p['jenis']];
-                    array_push($pengaduanFixs, [
-                        ...$p,
-                        "aksiBy" => $aksiData['nama'] . " (" . $aksiData['jabatan'] . ")",
-                        'fotoAksiBy' => isset($aksiData['foto']) ? $aksiData['foto'] : null 
-                    ]);
-                } else {
-                    array_push($pengaduanFixs, [
-                        ...$p,
-                        "aksiBy" => "Data tidak ditemukan.",
-                        'fotoAksiBy' => null
-                    ]);
-                }
-            }            
+{
+    if ($nik == null) {
+        $data = [
+            'status' => 404,
+            'message' => 'failed',
+            'data' => "NIK warga tidak ditemukan"
+        ];
+        
+        return $this->respond($data, 404);
+    } else {
+        // Ambil semua pengaduan warga berdasarkan NIK
+        $pengaduans = $this->PengaduanModel->where('nik', $nik)->get()->getResultArray();
+        $pengaduanFixs = [];
 
-            $data = [
-                'status' => 200,
-                'message' => 'success',
-                'data' => $pengaduanFixs
-            ];
+        foreach ($pengaduans as $p) {
+            // Ambil ID pengurus yang membalas pengaduan
+            $idPengurus = $p['id_pengurus']; 
 
-            return $this->respond($data, 200);
+            $pengurusData = $this->PengurusModel->where('id_pengurus', $idPengurus)->first();
+
+            if ($pengurusData) {
+                // Dapatkan NIK pengurus dari tabel pengurus
+                $nikPengurus = $pengurusData['nik'];
+            
+                // Cari data pengurus dari tabel warga berdasarkan NIK yang ditemukan
+                $pengurus = $this->WargaModel->where('nik', $nikPengurus)->first();
+                
+                array_push($pengaduanFixs, [
+                    ...$p,
+                    "aksiBy" => $pengurus ? $pengurus['nama'] : "Data pengurus tidak ditemukan.",
+                    "jabatanAksiBy" => $pengurusData['jabatan'],
+                    'fotoAksiBy' => $pengurus ? $pengurus['foto'] : null
+                ]);
+            } else {
+                array_push($pengaduanFixs, [
+                    ...$p,
+                    "aksiBy" => "Data pengurus tidak ditemukan.",
+                    "jabatanAksiBy" => "Tidak diketahui",
+                    'fotoAksiBy' => null
+                ]);
+            }
         }
+
+        $data = [
+            'status' => 200,
+            'message' => 'success',
+            'data' => $pengaduanFixs
+        ];
+
+        return $this->respond($data, 200);
     }
+}
+
 
     /**
      * Return the properties of a resource object.
