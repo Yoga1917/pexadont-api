@@ -96,7 +96,7 @@ class ApiKas extends ResourceController
         $id_kas = $this->request->getVar('id_kas') ?? null;
         $id_pengurus = $this->request->getJSON(true)['id_pengurus'] ?? null; 
 
-        if($id_kas == null || $id_pengurus == null) {
+        if($id_kas == null) {
             $data = [
                 'status' => 404,
                 'error' => true,
