@@ -114,31 +114,33 @@ class ApiPengaduan extends ResourceController
             return $this->respond($data, 404);
         } else {
             // Ambil semua pengaduan berdasarkan jenis pengaduan
-            $pengaduans = $this->PengaduanModel->where('jenis', $jenis)->get()->getResultArray();
+            $pengaduans = $this->PengaduanModel->findByJenis($jenis);
             $pengaduanFixs = [];
 
             foreach ($pengaduans as $p) {
                 // Ambil ID pengurus yang membalas pengaduan
-                $idPengurus = $p['id_pengurus']; 
+                $idPengurus = $p['id_pengurus'] ?? null; 
 
                 $pengurusData = $this->PengurusModel->where('id_pengurus', $idPengurus)->first();
 
                 if ($pengurusData) {
                     // Dapatkan NIK pengurus dari tabel pengurus
                     $nikPengurus = $pengurusData['nik'];
-                
+                    
                     // Cari data pengurus dari tabel warga berdasarkan NIK yang ditemukan
                     $pengurus = $this->WargaModel->where('nik', $nikPengurus)->first();
                     
                     array_push($pengaduanFixs, [
                         ...$p,
                         "aksiBy" => $pengurus ? $pengurus['nama'] : "Data pengurus tidak ditemukan.",
+                        "jabatanAksiBy" => $pengurusData['jabatan'], // Tambahan jabatan pengurus
                         'fotoAksiBy' => $pengurus ? $pengurus['foto'] : null
                     ]);
                 } else {
                     array_push($pengaduanFixs, [
                         ...$p,
                         "aksiBy" => "Data pengurus tidak ditemukan.",
+                        "jabatanAksiBy" => "Tidak diketahui", // Tambahan untuk jabatan default
                         'fotoAksiBy' => null
                     ]);
                 }
@@ -153,6 +155,7 @@ class ApiPengaduan extends ResourceController
             return $this->respond($data, 200);
         }
     }
+
 
     /**
      * Create a new resource object, from "posted" parameters.
