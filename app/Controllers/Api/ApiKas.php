@@ -94,7 +94,7 @@ class ApiKas extends ResourceController
     public function publish()
     {
         $id_kas = $this->request->getVar('id_kas') ?? null;
-        $id_pengurus = $this->request->getJSON(true)['id_pengurus'] ?? null; 
+        $id_pengurus = $this->request->getVar('id_pengurus') ?? 0; 
 
         if($id_kas == null) {
             $data = [
@@ -105,11 +105,11 @@ class ApiKas extends ResourceController
 
             return $this->respond($data, 404);
         }else{
-            if ($id_pengurus === null) {
+            if ($id_pengurus === 0) {
                 return $this->respond([
                     'status' => 400,
                     'error' => true,
-                    'message' => 'ID Pengurus tidak boleh null'
+                    'message' => 'ID Pengurus harus diisi!'
                 ], 400);
             }            
 
@@ -122,7 +122,7 @@ class ApiKas extends ResourceController
             $next_kas = [
                 "bulan" => $next_month,
                 "tahun" => $current_publish['tahun']+1,
-                "id_pengurus" => null,
+                "id_pengurus" => 0,
             ];
             
             $this->model->insert($next_kas);
