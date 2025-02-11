@@ -18,6 +18,33 @@ class PengaduanModel extends Model
             ->get()->getResultArray();
     }
 
+    public function getPengaduanWithPengurus()
+    {
+        return $this->db->table('pengaduan')
+        ->select('pengaduan.*, pengurus.id_pengurus, warga.nama as aksiBy, warga.foto as fotoAksiBy')
+            ->join('pengurus', 'pengurus.id_pengurus = pengaduan.id_pengurus', 'left')
+            ->join('warga', 'warga.nik = pengurus.nik', 'left') // Join ke tabel warga
+            ->get()->getResultArray();
+    }
+
+    public function getPengaduanLengkap()
+    {
+        $pengaduanRelasiWarga = $this->relasiWarga();
+        $pengaduanWithPengurus = $this->getPengaduanWithPengurus();
+
+        // Gabungkan dua hasil query berdasarkan ID Kegiatan
+        foreach ($pengaduanRelasiWarga as &$pengaduan) {
+            foreach ($pengaduanWithPengurus as $pengurus) {
+                if ($pengaduan['id_pengaduan'] == $pengurus['id_pengaduan']) {
+                    $pengaduan['id_pengurus'] = $pengurus['id_pengurus'];
+                    $pengaduan['aksiBy'] = $pengurus['aksiBy'];
+                    $pengaduan['fotoAksiBy'] = $pengurus['fotoAksiBy'];
+                }
+            }
+        }
+        return $pengaduanRelasiWarga;
+    }
+
     public function findByJenis($jenis)
     {
         return $this->db->table('pengaduan')

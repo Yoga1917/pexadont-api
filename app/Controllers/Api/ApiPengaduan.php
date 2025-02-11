@@ -29,87 +29,70 @@ class ApiPengaduan extends ResourceController
     
     public function index()
     {
-        $aksiBy = [
-            "Kinerja" => $this->PengurusModel->getByJabatan("Ketua RT"),
-            "Fasilitas" => $this->PengurusModel->getByJabatan("Ketua RT"),
-            "Kegiatan" => $this->PengurusModel->getByJabatan("Sekretaris"),
-            "Keuangan" => $this->PengurusModel->getByJabatan("Bendahara"),
-            "Kebersihan" => $this->PengurusModel->getByJabatan("Kordinator Kebersihan"),
-            "Keamanan" => $this->PengurusModel->getByJabatan("Kordinator Keamanan"),
-        ];
-        
-        $pengaduans = $this->PengaduanModel->relasiWarga();
-        $pengaduanFixs = [];
-        foreach ($pengaduans as $p) {
-            array_push($pengaduanFixs, [
-                ...$p,
-                "aksiBy" => $aksiBy[$p['jenis']]['nama'] ." (". $aksiBy[$p['jenis']]['jabatan'] . ")",
-                "fotoAksiBy" => $aksiBy[$p['jenis']]['foto']
-            ]);
-        }
+        $pengaduan = $this->PengaduanModel->getPengaduanLengkap();
 
-        $data = [
-            'status' => 200,
-            'message' => 'Success',
-            'data' => $pengaduanFixs
+        $response = [
+            'status'    => 200,
+            'message'   => 'Success',
+            'data'      => $pengaduan
         ];
 
-        return $this->respond($data, 200);
+        return $this->respond($response, 200);
     }
     
     public function warga($nik = null)
-{
-    if ($nik == null) {
-        $data = [
-            'status' => 404,
-            'message' => 'failed',
-            'data' => "NIK warga tidak ditemukan"
-        ];
-        
-        return $this->respond($data, 404);
-    } else {
-        // Ambil semua pengaduan warga berdasarkan NIK
-        $pengaduans = $this->PengaduanModel->where('nik', $nik)->get()->getResultArray();
-        $pengaduanFixs = [];
-
-        foreach ($pengaduans as $p) {
-            // Ambil ID pengurus yang membalas pengaduan
-            $idPengurus = $p['id_pengurus']; 
-
-            $pengurusData = $this->PengurusModel->where('id_pengurus', $idPengurus)->first();
-
-            if ($pengurusData) {
-                // Dapatkan NIK pengurus dari tabel pengurus
-                $nikPengurus = $pengurusData['nik'];
+    {   
+        if ($nik == null) {
+            $data = [
+                'status' => 404,
+                'message' => 'failed',
+                'data' => "NIK warga tidak ditemukan"
+            ];
             
-                // Cari data pengurus dari tabel warga berdasarkan NIK yang ditemukan
-                $pengurus = $this->WargaModel->where('nik', $nikPengurus)->first();
+            return $this->respond($data, 404);
+        } else {
+            // Ambil semua pengaduan warga berdasarkan NIK
+            $pengaduans = $this->PengaduanModel->where('nik', $nik)->get()->getResultArray();
+            $pengaduanFixs = [];
+
+            foreach ($pengaduans as $p) {
+                // Ambil ID pengurus yang membalas pengaduan
+                $idPengurus = $p['id_pengurus']; 
+
+                $pengurusData = $this->PengurusModel->where('id_pengurus', $idPengurus)->first();
+
+                if ($pengurusData) {
+                    // Dapatkan NIK pengurus dari tabel pengurus
+                    $nikPengurus = $pengurusData['nik'];
                 
-                array_push($pengaduanFixs, [
-                    ...$p,
-                    "aksiBy" => $pengurus ? $pengurus['nama'] : "Data pengurus tidak ditemukan.",
-                    "jabatanAksiBy" => $pengurusData['jabatan'],
-                    'fotoAksiBy' => $pengurus ? $pengurus['foto'] : null
-                ]);
-            } else {
-                array_push($pengaduanFixs, [
-                    ...$p,
-                    "aksiBy" => "Data pengurus tidak ditemukan.",
-                    "jabatanAksiBy" => "Tidak diketahui",
-                    'fotoAksiBy' => null
-                ]);
+                    // Cari data pengurus dari tabel warga berdasarkan NIK yang ditemukan
+                    $pengurus = $this->WargaModel->where('nik', $nikPengurus)->first();
+                    
+                    array_push($pengaduanFixs, [
+                        ...$p,
+                        "aksiBy" => $pengurus ? $pengurus['nama'] : "Data pengurus tidak ditemukan.",
+                        "jabatanAksiBy" => $pengurusData['jabatan'],
+                        'fotoAksiBy' => $pengurus ? $pengurus['foto'] : null
+                    ]);
+                } else {
+                    array_push($pengaduanFixs, [
+                        ...$p,
+                        "aksiBy" => "Data pengurus tidak ditemukan.",
+                        "jabatanAksiBy" => "Tidak diketahui",
+                        'fotoAksiBy' => null
+                    ]);
+                }
             }
+
+            $data = [
+                'status' => 200,
+                'message' => 'success',
+                'data' => $pengaduanFixs
+            ];
+
+            return $this->respond($data, 200);
         }
-
-        $data = [
-            'status' => 200,
-            'message' => 'success',
-            'data' => $pengaduanFixs
-        ];
-
-        return $this->respond($data, 200);
     }
-}
 
 
     /**
