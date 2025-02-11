@@ -220,9 +220,11 @@ class ApiPengaduan extends ResourceController
             
             return $this->respond($data, 404);
         }else{
+            $id_pengurus = $this->request->getVar('id_pengurus') ?? 0;
             // update
             $this->PengaduanModel->update($this->request->getVar('id_pengaduan'), [
                 "balasan" => $this->request->getVar('balasan'),
+                "id_pengurus" => $id_pengurus,
             ]);
             
             // notif
