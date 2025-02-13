@@ -21,7 +21,7 @@ class PengaduanModel extends Model
     public function getPengaduanWithPengurus()
     {
         return $this->db->table('pengaduan')
-        ->select('pengaduan.*, pengaduan.id_pengurus, warga.nama as aksiBy, warga.foto as fotoAksiBy')
+        ->select('pengaduan.*, pengaduan.id_pengurus, warga.nama as aksiBy, warga.foto as fotoAksiBy, pengurus.jabatan as jabatanAksiBy')
             ->join('pengurus', 'pengurus.id_pengurus = pengaduan.id_pengurus', 'left')
             ->join('warga', 'warga.nik = pengurus.nik', 'left') // Join ke tabel warga
             ->get()->getResultArray();
@@ -39,6 +39,7 @@ class PengaduanModel extends Model
                     $pengaduan['id_pengurus'] = $pengurus['id_pengurus'];
                     $pengaduan['aksiBy'] = $pengurus['aksiBy'];
                     $pengaduan['fotoAksiBy'] = $pengurus['fotoAksiBy'];
+                    $pengaduan['jabatanAksiBy'] = $pengurus['jabatanAksiBy'];
                 }
             }
         }
