@@ -4,11 +4,19 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class WargaModel extends Model
+class KeluargaModel extends Model
 {
-    protected $table            = 'warga';
-    protected $primaryKey       = 'nik';
-    protected $allowedFields    = ['no_kk', 'nik', 'nama', 'jenis_kelamin', 'tempat_lahir', 'tgl_lahir', 'agama', 'status_nikah', 'pendidikan', 'pekerjaan', 'gaji', 'nama_ayah', 'nama_ibu', 'status_keluarga', 'no_rumah', 'no_wa', 'password', 'foto', 'status'];
+    protected $table            = 'keluarga';
+    protected $primaryKey       = 'no_kk';
+    protected $allowedFields    = ['no_kk', 'nik', 'alamat', 'latitude', 'longitude', 'status'];
+
+    public function relasiWarga()
+    {
+        return $this->db->table('keluarga')
+            ->join('warga', 'warga.nik = keluarga.nik')
+            ->select('keluarga.*, warga.nama as kepala_keluarga, warga.foto as foto_kepala_keluarga')
+            ->get()->getResultArray();
+    }
 
     // protected $useAutoIncrement = true;
     // protected $returnType       = 'array';
