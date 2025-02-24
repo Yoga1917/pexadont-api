@@ -107,12 +107,6 @@ class ApiWarga extends ResourceController
                     'required' => 'Status Keluarga warga harus diisi'
                 ]
             ],
-            'no_rumah'  => [
-                'rules' => 'required',
-                'errors' => [
-                    'required' => 'Nomor rumah warga harus diisi'
-                ]
-            ],
             'no_wa'  => [
                 'rules' => 'permit_empty',
             ],
@@ -163,7 +157,6 @@ class ApiWarga extends ResourceController
             'nama_ayah' => $this->request->getVar('nama_ayah'),
             'nama_ibu' => $this->request->getVar('nama_ibu'),
             'status_keluarga' => $this->request->getVar('status_keluarga'),
-            'no_rumah' => $this->request->getVar('no_rumah'),
             'no_wa' => $this->request->getVar('no_wa'),
             'password' => password_hash($this->request->getVar('password'), PASSWORD_DEFAULT),
             'foto' => $newName,
@@ -275,12 +268,6 @@ class ApiWarga extends ResourceController
                     'required' => 'Status Keluarga warga harus diisi'
                 ]
             ],
-            'no_rumah'  => [
-                'rules' => 'required',
-                'errors' => [
-                    'required' => 'Nomor rumah warga harus diisi'
-                ]
-            ],
             'no_wa'  => [
                 'rules' => 'required',
                 'errors' => [
@@ -338,7 +325,6 @@ class ApiWarga extends ResourceController
             'pekerjaan' => $this->request->getVar('pekerjaan'),
             'gaji' => $this->request->getVar('gaji'),
             'status_keluarga' => $this->request->getVar('status_keluarga'),
-            'no_rumah' => $this->request->getVar('no_rumah'),
             'no_wa' => $this->request->getVar('no_wa'),
             'password' => password_hash($this->request->getVar('password'), PASSWORD_DEFAULT),
             'foto' => $newName,

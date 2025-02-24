@@ -48,6 +48,12 @@ class ApiKeluarga extends ResourceController
                     'required'      => 'NIK Warga Harus Diisi',
                 ]
             ],
+            'no_rumah'  => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'Nomor rumah warga harus diisi'
+                ]
+            ],
             'alamat' => [
                 'rules'     => 'required',
                 'errors'    => [
@@ -85,6 +91,7 @@ class ApiKeluarga extends ResourceController
         $data = [
             'no_kk'       => $this->request->getPost('no_kk'),
             'nik'         => $this->request->getPost('nik'),
+            'no_rumah'    => $this->request->getPost('no_rumah'),
             'alamat'      => $this->request->getPost('alamat'),
             'latitude'    => $this->request->getPost('latitude'),
             'longitude'   => $this->request->getPost('longitude'),
@@ -130,6 +137,12 @@ class ApiKeluarga extends ResourceController
                     'required'      => 'NIK Warga Harus Diisi',
                 ]
             ],
+            'no_rumah'  => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'Nomor rumah warga harus diisi'
+                ]
+            ],
             'alamat' => [
                 'rules'     => 'required',
                 'errors'    => [
@@ -165,6 +178,7 @@ class ApiKeluarga extends ResourceController
 
         $data = [
             'nik'         => $this->request->getPost('nik'),
+            'no_rumah'    => $this->request->getPost('no_rumah'),
             'alamat'      => $this->request->getPost('alamat'),
             'latitude'    => $this->request->getPost('latitude'),
             'longitude'   => $this->request->getPost('longitude'),
