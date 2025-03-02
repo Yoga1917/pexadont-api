@@ -8,7 +8,7 @@ class KeluargaModel extends Model
 {
     protected $table            = 'keluarga';
     protected $primaryKey       = 'no_kk';
-    protected $allowedFields    = ['no_kk', 'nik', 'alamat', 'latitude', 'longitude', 'status'];
+    protected $allowedFields    = ['no_kk', 'nik', 'no_rumah', 'alamat', 'latitude', 'longitude', 'status'];
 
     public function relasiWarga()
     {
