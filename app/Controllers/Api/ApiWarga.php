@@ -158,7 +158,7 @@ class ApiWarga extends ResourceController
             'nama_ibu' => $this->request->getVar('nama_ibu'),
             'status_keluarga' => $this->request->getVar('status_keluarga'),
             'no_wa' => $this->request->getVar('no_wa'),
-            'password' => password_hash($this->request->getVar('password'), PASSWORD_DEFAULT),
+            'password' => $this->request->getVar('password') ? password_hash($this->request->getVar('password'), PASSWORD_DEFAULT) : null,
             'foto' => $newName,
             'status' => $this->request->getVar('status')
         ];
