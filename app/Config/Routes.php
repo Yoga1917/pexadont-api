@@ -56,6 +56,8 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], function ($routes)
     $routes->post('keluarga/simpan', 'ApiKeluarga::create');
     $routes->get('keluarga/edit/(:num)', 'ApiKeluarga::edit/$1');
     $routes->post('keluarga/update/(:num)', 'ApiKeluarga::update/$1');
+    $routes->get('keluarga/terima', 'ApiKeluarga::terima');
+    $routes->get('keluarga/tolak', 'ApiKeluarga::tolak');
 
     // api warga
     $routes->get('warga', 'ApiWarga::index');

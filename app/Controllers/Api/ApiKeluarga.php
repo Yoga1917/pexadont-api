@@ -193,4 +193,45 @@ class ApiKeluarga extends ResourceController
         ];
         return $this->respond($response, 202);
     }
+
+    public function terima(){
+        if ($this->request->getVar('no_kk') == null){
+            $response = [
+                'status' => 404,
+                'error' => true,
+                'data' => 'Keluarga tidak ditemukan'
+            ];
+            return $this->respond($response, 404);
+        }
+        // update status
+        $this->KeluargaModel->update($this->request->getVar('no_kk'), ['status' => "Menetap"]);
+
+        $response = [
+            'status' => 200,
+            'error' => false,
+            'data' => 'Pendaftaran Keluarga berhasil diterima'
+        ];
+        return $this->respond($response, 200);
+    }
+
+    public function tolak(){
+        if ($this->request->getVar('no_kk') == null){
+            $response = [
+                'status' => 404,
+                'error' => true,
+                'data' => 'Data Nomor Kepala Keluarga diperlukan!'
+            ];
+            return $this->respond($response, 404);
+        }
+
+        // delete Keluarga
+        $this->KeluargaModel->delete($this->request->getVar('no_kk'));
+
+        $response = [
+            'status' => 200,
+            'error' => false,
+            'data' => 'Pendaftaran Keluarga ditolak'
+        ];
+        return $this->respond($response, 200);
+    }
 }
